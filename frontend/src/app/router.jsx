@@ -10,6 +10,12 @@ import ProfilePage from "../pages/common/ProfilePage";
 import PendingApprovalPage from "../pages/common/PendingApprovalPage";
 import ProtectedRoute from "../routes/ProtectedRoute";
 import RoleRoute from "../routes/RoleRoute";
+import AdminLayout from "../layouts/AdminLayout";
+import AdminDashboard from "../pages/admin/AdminDashboard";
+import FacilitiesAssetsPage from "../pages/admin/FacilitiesAssetsPage";
+import BookingManagementPage from "../pages/admin/BookingManagementPage";
+import MaintenanceTicketingPage from "../pages/admin/MaintenanceTicketingPage";
+import NotificationsPage from "../pages/admin/NotificationsPage";
 
 const router = createBrowserRouter([
   {
@@ -52,9 +58,17 @@ const router = createBrowserRouter([
     path: "/admin",
     element: (
       <RoleRoute allowedRoles={["ADMIN"]}>
-        <AdminPage />
+        <AdminLayout />
       </RoleRoute>
     ),
+    children: [
+      { path: "", element: <AdminDashboard /> },
+      { path: "users", element: <AdminPage /> },
+      { path: "facilities", element: <FacilitiesAssetsPage /> },
+      { path: "bookings", element: <BookingManagementPage /> },
+      { path: "maintenance", element: <MaintenanceTicketingPage /> },
+      { path: "notifications", element: <NotificationsPage /> },
+    ]
   },
   {
     path: "/technician",
