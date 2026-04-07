@@ -1,45 +1,45 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_URL = 'http://localhost:8081/api/resources';
+const API = axios.create({
+  baseURL: "http://localhost:8081",
+  withCredentials: true,
+});
 
-// We fetch the JWT token if necessary (assuming a getAuthToken util or we can just pass it directly if we rely on interceptors, but I'll add header just in case)
-const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
-    return token ? { Authorization: `Bearer ${token}` } : {};
-};
+export const getAllResources = async (filters = {}) => {
+  const { type, capacity, location } = filters;
+  const params = new URLSearchParams();
+  if (type) params.append("type", type);
+  if (capacity) params.append("capacity", capacity);
+  if (location) params.append("location", location);
 
-export const getResources = async (params = {}) => {
-    const response = await axios.get(API_URL, {
-        params,
-        headers: getAuthHeaders()
-    });
-    return response.data;
+  const response = await API.get(`/api/resources?${params.toString()}`);
+  return response.data;
 };
 
 export const getResourceById = async (id) => {
-    const response = await axios.get(`${API_URL}/${id}`, {
-        headers: getAuthHeaders()
-    });
-    return response.data;
+  const response = await API.get(`/api/resources/${id}`);
+  return response.data;
 };
 
-export const createResource = async (resource) => {
-    const response = await axios.post(API_URL, resource, {
-        headers: getAuthHeaders()
-    });
-    return response.data;
+export const createResource = async (resourceData) => {
+  const response = await API.post("/api/resources", resourceData);
+  return response.data;
 };
 
-export const updateResource = async (id, resource) => {
-    const response = await axios.put(`${API_URL}/${id}`, resource, {
-        headers: getAuthHeaders()
-    });
-    return response.data;
+export const updateResource = async (id, resourceData) => {
+  const response = await API.put(`/api/resources/${id}`, resourceData);
+  return response.data;
 };
 
 export const deleteResource = async (id) => {
-    const response = await axios.delete(`${API_URL}/${id}`, {
-        headers: getAuthHeaders()
-    });
-    return response.data;
+  const response = await API.delete(`/api/resources/${id}`);
+  return response.data;
+};
+
+export default {
+  getAllResources,
+  getResourceById,
+  createResource,
+  updateResource,
+  deleteResource,
 };

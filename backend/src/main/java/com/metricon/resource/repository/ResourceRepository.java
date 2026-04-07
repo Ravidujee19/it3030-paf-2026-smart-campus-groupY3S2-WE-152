@@ -8,7 +8,11 @@ import java.util.List;
 
 @Repository
 public interface ResourceRepository extends JpaRepository<Resource, Long> {
-    List<Resource> findByType(Resource.ResourceType type);
-    List<Resource> findByCapacityGreaterThanEqual(Integer capacity);
-    List<Resource> findByLocationContainingIgnoreCase(String location);
+    @org.springframework.data.jpa.repository.Query("SELECT r FROM Resource r WHERE " +
+            "(:type IS NULL OR r.type = :type) AND " +
+            "(:capacity IS NULL OR r.capacity >= :capacity) AND " +
+            "(:location IS NULL OR LOWER(r.location) LIKE LOWER(CONCAT('%', :location, '%')))")
+    List<Resource> findWithFilters(@org.springframework.data.repository.query.Param("type") Resource.ResourceType type, 
+                                   @org.springframework.data.repository.query.Param("capacity") Integer capacity, 
+                                   @org.springframework.data.repository.query.Param("location") String location);
 }

@@ -11,11 +11,13 @@ import PendingApprovalPage from "../pages/common/PendingApprovalPage";
 import ProtectedRoute from "../routes/ProtectedRoute";
 import RoleRoute from "../routes/RoleRoute";
 import AdminLayout from "../layouts/AdminLayout";
+import StaffLayout from "../layouts/StaffLayout";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import FacilitiesAssetsPage from "../pages/admin/FacilitiesAssetsPage";
 import BookingManagementPage from "../pages/admin/BookingManagementPage";
 import MaintenanceTicketingPage from "../pages/admin/MaintenanceTicketingPage";
 import NotificationsPage from "../pages/admin/NotificationsPage";
+import ResourceListPage from "../pages/resources/ResourceListPage";
 
 const router = createBrowserRouter([
   {
@@ -82,9 +84,13 @@ const router = createBrowserRouter([
     path: "/staff",
     element: (
       <RoleRoute allowedRoles={["STAFF", "TECHNICIAN", "ADMIN"]}>
-        <StaffPage />
+        <StaffLayout />
       </RoleRoute>
     ),
+    children: [
+      { path: "", element: <StaffPage /> },
+      { path: "facilities", element: <ResourceListPage /> },
+    ]
   },
   {
     path: "/unauthorized",
