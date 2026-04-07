@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import resourceService from '../../services/resourceService';
 import ResourceCard from './components/ResourceCard';
+import ResourceModal from './components/ResourceModal';
 import './ResourceListPage.css';
 
 const ResourceListPage = ({ refreshTrigger, hideHeader = false }) => {
@@ -12,6 +13,10 @@ const ResourceListPage = ({ refreshTrigger, hideHeader = false }) => {
     capacity: '',
     location: '',
   });
+
+  // Edit Modal State
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedResource, setSelectedResource] = useState(null);
 
   useEffect(() => {
     fetchResources();
@@ -28,6 +33,24 @@ const ResourceListPage = ({ refreshTrigger, hideHeader = false }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await resourceService.deleteResource(id);
+      setResources((prev) => prev.filter((r) => r.id !== id));
+    } catch (err) {
+      alert('Failed to delete resource. Please try again.');
+    }
+  };
+
+  const handleEdit = (resource) => {
+    setSelectedResource(resource);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateSuccess = () => {
+    fetchResources();
   };
 
   const handleFilterChange = (e) => {
@@ -95,7 +118,12 @@ const ResourceListPage = ({ refreshTrigger, hideHeader = false }) => {
         <div className="resource-grid">
           {resources.length > 0 ? (
             resources.map((resource) => (
-              <ResourceCard key={resource.id} resource={resource} />
+              <ResourceCard 
+                key={resource.id} 
+                resource={resource} 
+                onDelete={handleDelete}
+                onEdit={() => handleEdit(resource)}
+              />
             ))
           ) : (
             <div className="no-results">
@@ -105,6 +133,18 @@ const ResourceListPage = ({ refreshTrigger, hideHeader = false }) => {
           )}
         </div>
       )}
+
+      {/* Edit Modal */}
+      <ResourceModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setSelectedResource(null);
+        }}
+        onSuccess={handleUpdateSuccess}
+        initialData={selectedResource}
+        mode="EDIT"
+      />
     </div>
   );
 };

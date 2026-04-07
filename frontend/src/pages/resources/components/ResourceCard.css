@@ -18,14 +18,55 @@
 .resource-card-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 16px;
 }
 
-.resource-icon {
-  font-size: 24px;
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
+.admin-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.edit-item-btn,
+.delete-item-btn {
+  background: white;
+  border: 1px solid #e2e8f0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 1rem;
+}
+
+.edit-item-btn {
+  color: #6366f1;
+}
+
+.edit-item-btn:hover {
+  background: #f5f3ff;
+  border-color: #6366f1;
+  transform: translateY(-2px);
+}
+
+.delete-item-btn {
+  color: #ef4444;
+}
+
+.delete-item-btn:hover {
+  background: #fef2f2;
+  border-color: #ef4444;
+  transform: translateY(-2px);
+}
 .status-badge {
   padding: 4px 12px;
   border-radius: 20px;

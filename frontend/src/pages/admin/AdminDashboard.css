@@ -1,0 +1,144 @@
+/* Admin Dashboard Specific Analytics Styles */
+
+.admin-dashboard-container {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.dashboard-content-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 32px;
+}
+
+/* Tooltip/No Data styles */
+.no-data-msg {
+  color: var(--admin-text-light);
+  text-align: center;
+  padding: 40px 0;
+  font-style: italic;
+}
+
+/* Vertical Bar Chart for Top Resources */
+.analytics-bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.analytics-bar-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bar-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bar-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--admin-text-dark);
+}
+
+.bar-count {
+  font-size: 0.8rem;
+  color: var(--admin-text-light);
+}
+
+.bar-background {
+  height: 10px;
+  background-color: #f1f5f9;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.bar-foreground {
+  height: 100%;
+  background: linear-gradient(90deg, var(--admin-primary), #60a5fa);
+  border-radius: 5px;
+  width: 0;
+  transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Hourly Peak Distribution Chart */
+.analytics-hours-container {
+  padding-top: 20px;
+}
+
+.hours-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 200px;
+  gap: 6px;
+}
+
+.hour-bar-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.hour-bar-wrapper {
+  width: 100%;
+  height: 100%;
+  background-color: #f8fafc;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  position: relative;
+}
+
+.hour-bar-inner {
+  background-color: var(--admin-primary);
+  width: 100%;
+  border-radius: 4px 4px 0 0;
+  transition: height 1s ease-out, background-color 0.2s;
+  cursor: help;
+}
+
+.hour-bar-inner:hover {
+  background-color: var(--admin-primary-hover);
+}
+
+.hour-tick {
+  font-size: 0.65rem;
+  color: var(--admin-text-light);
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+/* Loading State */
+.admin-loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  color: var(--admin-text-light);
+}
+
+.admin-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top-color: var(--admin-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

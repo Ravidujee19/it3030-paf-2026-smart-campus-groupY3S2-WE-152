@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import resourceService from '../../../services/resourceService';
-import './CreateResourceModal.css';
+import './ResourceModal.css';
 
-const CreateResourceModal = ({ isOpen, onClose, onSuccess }) => {
+const ResourceModal = ({ isOpen, onClose, onSuccess, initialData = null, mode = 'CREATE' }) => {
   const [formData, setFormData] = useState({
     name: '',
     type: 'LECTURE_HALL',
@@ -13,6 +13,28 @@ const CreateResourceModal = ({ isOpen, onClose, onSuccess }) => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (initialData && mode === 'EDIT') {
+      setFormData({
+        name: initialData.name || '',
+        type: initialData.type || 'LECTURE_HALL',
+        capacity: initialData.capacity || '',
+        location: initialData.location || '',
+        status: initialData.status || 'ACTIVE',
+        availabilityWindows: initialData.availabilityWindows || '',
+      });
+    } else {
+      setFormData({
+        name: '',
+        type: 'LECTURE_HALL',
+        capacity: '',
+        location: '',
+        status: 'ACTIVE',
+        availabilityWindows: '',
+      });
+    }
+  }, [initialData, mode, isOpen]);
 
   if (!isOpen) return null;
 
@@ -31,29 +53,42 @@ const CreateResourceModal = ({ isOpen, onClose, onSuccess }) => {
         ...formData,
         capacity: parseInt(formData.capacity, 10),
       };
-      await resourceService.createResource(data);
+
+      if (mode === 'EDIT' && initialData?.id) {
+        await resourceService.updateResource(initialData.id, data);
+      } else {
+        await resourceService.createResource(data);
+      }
+
       onSuccess();
       onClose();
-      setFormData({
-        name: '',
-        type: 'LECTURE_HALL',
-        capacity: '',
-        location: '',
-        status: 'ACTIVE',
-        availabilityWindows: '',
-      });
+      if (mode === 'CREATE') {
+        setFormData({
+          name: '',
+          type: 'LECTURE_HALL',
+          capacity: '',
+          location: '',
+          status: 'ACTIVE',
+          availabilityWindows: '',
+        });
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to create resource. Please check your inputs.');
+      setError(err.response?.data?.message || `Failed to ${mode.toLowerCase()} resource. Please check your inputs.`);
     } finally {
       setLoading(false);
     }
   };
 
+  const title = mode === 'EDIT' ? 'Update Resource' : 'Add New Resource';
+  const buttonText = loading 
+    ? (mode === 'EDIT' ? 'Updating...' : 'Creating...') 
+    : (mode === 'EDIT' ? 'Update Resource' : 'Create Resource');
+
   return (
     <div className="modal-overlay">
       <div className="modal-content">
         <div className="modal-header">
-          <h2>Add New Resource</h2>
+          <h2>{title}</h2>
           <button className="close-btn" onClick={onClose}>&times;</button>
         </div>
         
@@ -113,7 +148,7 @@ const CreateResourceModal = ({ isOpen, onClose, onSuccess }) => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="status">Initial Status</label>
+            <label htmlFor="status">Status</label>
             <select id="status" name="status" value={formData.status} onChange={handleChange}>
               <option value="ACTIVE">Active</option>
               <option value="OUT_OF_SERVICE">Out of Service</option>
@@ -134,7 +169,7 @@ const CreateResourceModal = ({ isOpen, onClose, onSuccess }) => {
           <div className="modal-footer">
             <button type="button" className="btn-secondary" onClick={onClose}>Cancel</button>
             <button type="submit" className="btn-primary" disabled={loading}>
-              {loading ? 'Creating...' : 'Create Resource'}
+              {buttonText}
             </button>
           </div>
         </form>
@@ -143,4 +178,4 @@ const CreateResourceModal = ({ isOpen, onClose, onSuccess }) => {
   );
 };
 
-export default CreateResourceModal;
+export default ResourceModal;
