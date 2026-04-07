@@ -27,19 +27,28 @@ public class ResourceService {
     }
 
     public List<ResourceDto> searchResources(String type, Integer capacity, String location) {
-        Resource.ResourceType resourceType = null;
-        if (type != null && !type.isEmpty()) {
-            try {
-                resourceType = Resource.ResourceType.valueOf(type.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                // Ignore invalid resource types for search
+        return resourceRepository.findAll((root, query, cb) -> {
+            var predicates = new java.util.ArrayList<jakarta.persistence.criteria.Predicate>();
+
+            if (type != null && !type.isEmpty()) {
+                try {
+                    Resource.ResourceType resourceType = Resource.ResourceType.valueOf(type.toUpperCase());
+                    predicates.add(cb.equal(root.get("type"), resourceType));
+                } catch (IllegalArgumentException e) {
+                    // Ignore invalid type
+                }
             }
-        }
-        
-        return resourceRepository.findWithFilters(resourceType, capacity, location)
-                .stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+
+            if (capacity != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("capacity"), capacity));
+            }
+
+            if (location != null && !location.isEmpty()) {
+                predicates.add(cb.like(cb.lower(root.get("location")), "%" + location.toLowerCase() + "%"));
+            }
+
+            return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
+        }).stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
     public ResourceDto createResource(ResourceDto dto) {

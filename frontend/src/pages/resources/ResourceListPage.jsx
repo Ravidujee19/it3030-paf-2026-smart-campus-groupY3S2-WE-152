@@ -30,6 +30,15 @@ const ResourceListPage = ({ refreshTrigger, hideHeader = false }) => {
     }
   };
 
+  const handleDelete = async (id) => {
+    try {
+      await resourceService.deleteResource(id);
+      setResources((prev) => prev.filter((r) => r.id !== id));
+    } catch (err) {
+      alert('Failed to delete resource. Please try again.');
+    }
+  };
+
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters((prev) => ({ ...prev, [name]: value }));
@@ -95,7 +104,11 @@ const ResourceListPage = ({ refreshTrigger, hideHeader = false }) => {
         <div className="resource-grid">
           {resources.length > 0 ? (
             resources.map((resource) => (
-              <ResourceCard key={resource.id} resource={resource} />
+              <ResourceCard 
+                key={resource.id} 
+                resource={resource} 
+                onDelete={handleDelete}
+              />
             ))
           ) : (
             <div className="no-results">
@@ -107,6 +120,6 @@ const ResourceListPage = ({ refreshTrigger, hideHeader = false }) => {
       )}
     </div>
   );
-};
+}
 
 export default ResourceListPage;

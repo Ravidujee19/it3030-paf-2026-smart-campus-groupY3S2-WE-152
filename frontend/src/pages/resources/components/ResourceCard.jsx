@@ -1,8 +1,12 @@
 import React from 'react';
+import { useAuth } from '../../../context/AuthContext';
 import './ResourceCard.css';
 
-const ResourceCard = ({ resource }) => {
-  const { name, type, capacity, location, status } = resource;
+const ResourceCard = ({ resource, onDelete }) => {
+  const { id, name, type, capacity, location, status } = resource;
+  const { user } = useAuth();
+  
+  const isAdmin = user?.role === 'ADMIN';
 
   const getStatusClass = (status) => {
     return status === 'ACTIVE' ? 'status-active' : 'status-inactive';
@@ -18,13 +22,30 @@ const ResourceCard = ({ resource }) => {
     }
   };
 
+  const handleDeleteClick = () => {
+    if (window.confirm(`Are you sure you want to delete "${name}"?`)) {
+      onDelete(id);
+    }
+  };
+
   return (
     <div className="resource-card">
       <div className="resource-card-header">
-        <span className="resource-icon">{getTypeIcon(type)}</span>
-        <span className={`status-badge ${getStatusClass(status)}`}>
-          {status}
-        </span>
+        <div className="header-left">
+          <span className="resource-icon">{getTypeIcon(type)}</span>
+          <span className={`status-badge ${getStatusClass(status)}`}>
+            {status}
+          </span>
+        </div>
+        {isAdmin && (
+          <button 
+            className="delete-item-btn" 
+            onClick={handleDeleteClick}
+            title="Delete Resource"
+          >
+            🗑️
+          </button>
+        )}
       </div>
       <div className="resource-card-body">
         <h3 className="resource-name">{name}</h3>
