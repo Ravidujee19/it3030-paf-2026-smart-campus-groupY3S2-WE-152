@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
+import BookingRequestModal from '../../bookings/components/BookingRequestModal';
 import './ResourceCard.css';
 
 const ResourceCard = ({ resource, onDelete, onEdit }) => {
   const { id, name, type, capacity, location, status } = resource;
   const { user } = useAuth();
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   
   const isAdmin = user?.role === 'ADMIN';
 
@@ -32,6 +34,10 @@ const ResourceCard = ({ resource, onDelete, onEdit }) => {
   const handleEditClick = (e) => {
     e.stopPropagation();
     onEdit();
+  };
+
+  const handleBookingSuccess = () => {
+    alert('Booking request submitted successfully! An administrator will review it shortly.');
   };
 
   return (
@@ -77,8 +83,25 @@ const ResourceCard = ({ resource, onDelete, onEdit }) => {
         </div>
       </div>
       <div className="resource-card-footer">
-        <button className="view-details-btn">View Details</button>
+        {!isAdmin ? (
+          <button 
+            className="view-details-btn" 
+            style={{ background: 'linear-gradient(135deg, #6366f1, #818cf8)' }}
+            onClick={() => setIsBookingModalOpen(true)}
+          >
+            Book Now
+          </button>
+        ) : (
+          <button className="view-details-btn">View Details</button>
+        )}
       </div>
+
+      <BookingRequestModal 
+        isOpen={isBookingModalOpen}
+        onClose={() => setIsBookingModalOpen(false)}
+        resource={resource}
+        onSuccess={handleBookingSuccess}
+      />
     </div>
   );
 };

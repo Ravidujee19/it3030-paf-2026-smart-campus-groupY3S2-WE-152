@@ -52,9 +52,9 @@ public class AnalyticsService {
         List<Booking> allBookings = bookingRepository.findAll();
         Map<String, Object> stats = new java.util.HashMap<>();
         
-        stats.put("totalBookings", allBookings.size());
-        stats.put("activeBookings", allBookings.stream().filter(b -> b.getStatus() == Booking.BookingStatus.CONFIRMED).count());
-        stats.put("completedBookings", allBookings.stream().filter(b -> b.getStatus() == Booking.BookingStatus.COMPLETED).count());
+        stats.put("totalBookings", (long) allBookings.size());
+        stats.put("activeBookings", allBookings.stream().filter(b -> b.getStatus() == Booking.BookingStatus.APPROVED || b.getStatus() == Booking.BookingStatus.CONFIRMED).count());
+        stats.put("pendingBookings", allBookings.stream().filter(b -> b.getStatus() == Booking.BookingStatus.PENDING).count());
         
         return stats;
     }

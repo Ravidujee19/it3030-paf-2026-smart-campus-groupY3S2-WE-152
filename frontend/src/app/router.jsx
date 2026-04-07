@@ -18,6 +18,7 @@ import BookingManagementPage from "../pages/admin/BookingManagementPage";
 import MaintenanceTicketingPage from "../pages/admin/MaintenanceTicketingPage";
 import NotificationsPage from "../pages/admin/NotificationsPage";
 import ResourceListPage from "../pages/resources/ResourceListPage";
+import MyBookingsPage from "../pages/bookings/MyBookingsPage";
 
 const router = createBrowserRouter([
   {
@@ -90,6 +91,7 @@ const router = createBrowserRouter([
     children: [
       { path: "", element: <StaffPage /> },
       { path: "facilities", element: <ResourceListPage /> },
+      { path: "bookings", element: <MyBookingsPage /> },
     ]
   },
   {
