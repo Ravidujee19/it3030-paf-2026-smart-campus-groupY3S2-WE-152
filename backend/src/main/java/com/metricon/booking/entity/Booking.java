@@ -42,6 +42,11 @@ public class Booking {
     @Column(name = "expected_attendees")
     private Integer expectedAttendees;
 
+    @Builder.Default
+    private Boolean checkedIn = false;
+
+    private LocalDateTime checkInTime;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = true)
     private BookingStatus status;

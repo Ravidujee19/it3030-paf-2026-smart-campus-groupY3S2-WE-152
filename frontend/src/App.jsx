@@ -9,6 +9,8 @@ function App() {
     return <h2>Loading...</h2>;
   }
 
+  // NOTE: This App.jsx is partially bypassed by the RouterProvider in main.jsx 
+  // which uses src/app/router.jsx for the main application shell.
   return (
     <Router>
       <div style={{ padding: "1rem", minHeight: "100vh", backgroundColor: "#0f0f13", color: "white" }}>

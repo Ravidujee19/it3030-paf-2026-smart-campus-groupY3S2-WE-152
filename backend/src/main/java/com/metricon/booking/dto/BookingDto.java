@@ -24,5 +24,7 @@ public class BookingDto {
     private Integer expectedAttendees;
     private Booking.BookingStatus status;
     private String rejectReason;
+    private Boolean checkedIn;
+    private LocalDateTime checkInTime;
     private LocalDateTime createdAt;
 }

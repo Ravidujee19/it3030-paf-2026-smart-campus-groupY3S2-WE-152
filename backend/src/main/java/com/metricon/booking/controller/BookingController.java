@@ -88,4 +88,16 @@ public class BookingController {
         String reason = request.get("reason");
         return ResponseEntity.ok(bookingService.reviewBooking(id, status, reason));
     }
+
+    @PostMapping("/{id}/check-in")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    public ResponseEntity<BookingDto> checkInBooking(@PathVariable Long id) {
+        return ResponseEntity.ok(bookingService.checkInBooking(id));
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'STAFF')")
+    public ResponseEntity<BookingDto> getBookingById(@PathVariable Long id) {
+        return ResponseEntity.ok(bookingService.getBookingById(id));
+    }
 }
