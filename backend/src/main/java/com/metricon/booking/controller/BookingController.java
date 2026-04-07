@@ -84,8 +84,13 @@ public class BookingController {
             @PathVariable Long id,
             @RequestBody Map<String, String> request
     ) {
-        Booking.BookingStatus status = Booking.BookingStatus.valueOf(request.get("status").toUpperCase());
-        String reason = request.get("reason");
-        return ResponseEntity.ok(bookingService.reviewBooking(id, status, reason));
+        try {
+            Booking.BookingStatus status = Booking.BookingStatus.valueOf(request.get("status").toUpperCase());
+            String reason = request.get("reason");
+            return ResponseEntity.ok(bookingService.reviewBooking(id, status, reason));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 }

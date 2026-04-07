@@ -63,14 +63,14 @@ public class BookingService {
     @Transactional
     public BookingDto reviewBooking(Long bookingId, Booking.BookingStatus newStatus, String reason) {
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found"));
 
         if (booking.getStatus() != Booking.BookingStatus.PENDING) {
-            throw new RuntimeException("Only pending bookings can be approved or rejected.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only pending bookings can be approved or rejected. Current status: " + booking.getStatus());
         }
 
         if (newStatus == Booking.BookingStatus.REJECTED && (reason == null || reason.trim().isEmpty())) {
-            throw new RuntimeException("A reason must be provided when rejecting a booking.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A reason must be provided when rejecting a booking.");
         }
 
         booking.setStatus(newStatus);
