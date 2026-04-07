@@ -3,7 +3,7 @@ import resourceService from '../../services/resourceService';
 import ResourceCard from './components/ResourceCard';
 import './ResourceListPage.css';
 
-const ResourceListPage = () => {
+const ResourceListPage = ({ refreshTrigger, hideHeader = false }) => {
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,7 +15,7 @@ const ResourceListPage = () => {
 
   useEffect(() => {
     fetchResources();
-  }, [filters]);
+  }, [filters, refreshTrigger]);
 
   const fetchResources = async () => {
     setLoading(true);
@@ -37,10 +37,12 @@ const ResourceListPage = () => {
 
   return (
     <div className="resource-page">
-      <header className="resource-header">
-        <h1>Facilities & Assets Catalogue</h1>
-        <p>Explore and book resources across the Smart Campus.</p>
-      </header>
+      {!hideHeader && (
+        <header className="resource-header">
+          <h1>Facilities & Assets Catalogue</h1>
+          <p>Explore and book resources across the Smart Campus.</p>
+        </header>
+      )}
 
       <section className="filter-section">
         <div className="filter-grid">
