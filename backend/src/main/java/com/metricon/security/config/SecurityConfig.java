@@ -84,6 +84,9 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .cors(Customizer.withDefaults())
+            .exceptionHandling(e -> e.authenticationEntryPoint(
+                new org.springframework.security.web.authentication.HttpStatusEntryPoint(org.springframework.http.HttpStatus.UNAUTHORIZED)
+            ))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/error", "/login/**", "/oauth2/**").permitAll()
                 .requestMatchers("/api/users/me").authenticated()

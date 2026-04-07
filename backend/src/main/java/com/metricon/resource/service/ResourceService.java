@@ -27,25 +27,19 @@ public class ResourceService {
     }
 
     public List<ResourceDto> searchResources(String type, Integer capacity, String location) {
-        List<Resource> resources = resourceRepository.findAll();
-        
+        Resource.ResourceType resourceType = null;
         if (type != null && !type.isEmpty()) {
-            resources = resources.stream()
-                .filter(r -> r.getType().name().equalsIgnoreCase(type))
-                .collect(Collectors.toList());
+            try {
+                resourceType = Resource.ResourceType.valueOf(type.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                // Ignore invalid resource types for search
+            }
         }
-        if (capacity != null) {
-            resources = resources.stream()
-                .filter(r -> r.getCapacity() >= capacity)
+        
+        return resourceRepository.findWithFilters(resourceType, capacity, location)
+                .stream()
+                .map(this::mapToDto)
                 .collect(Collectors.toList());
-        }
-        if (location != null && !location.isEmpty()) {
-            resources = resources.stream()
-                .filter(r -> r.getLocation().toLowerCase().contains(location.toLowerCase()))
-                .collect(Collectors.toList());
-        }
-
-        return resources.stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
     public ResourceDto createResource(ResourceDto dto) {
