@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -96,11 +97,37 @@ public class BookingService {
         return mapToDto(bookingRepository.save(booking));
     }
 
+    @Transactional
+    public BookingDto checkInBooking(Long bookingId) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found"));
+
+        if (booking.getStatus() != Booking.BookingStatus.APPROVED && booking.getStatus() != Booking.BookingStatus.CONFIRMED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Only approved or confirmed bookings can be checked in. Current status: " + booking.getStatus());
+        }
+
+        if (Boolean.TRUE.equals(booking.getCheckedIn())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Booking is already checked in.");
+        }
+
+        booking.setCheckedIn(true);
+        booking.setCheckInTime(LocalDateTime.now());
+        
+        return mapToDto(bookingRepository.save(booking));
+    }
+
     @Transactional(readOnly = true)
     public List<BookingDto> getUserBookings(Long userId) {
         return bookingRepository.findByUserId(userId).stream()
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public BookingDto getBookingById(Long id) {
+        return bookingRepository.findById(id)
+                .map(this::mapToDto)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found"));
     }
 
     @Transactional(readOnly = true)
@@ -125,6 +152,8 @@ public class BookingService {
                 .expectedAttendees(entity.getExpectedAttendees())
                 .status(entity.getStatus())
                 .rejectReason(entity.getRejectReason())
+                .checkedIn(entity.getCheckedIn())
+                .checkInTime(entity.getCheckInTime())
                 .createdAt(entity.getCreatedAt())
                 .build();
     }

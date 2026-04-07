@@ -32,10 +32,22 @@ export const reviewBooking = async (id, status, reason) => {
   return response.data;
 };
 
+export const checkInBooking = async (id) => {
+  const response = await API.post(`/api/bookings/${id}/check-in`);
+  return response.data;
+};
+
+export const getBookingById = async (id) => {
+  const response = await API.get(`/api/bookings/${id}`);
+  return response.data;
+};
+
 export default {
   requestBooking,
   getMyBookings,
   cancelBooking,
   getAllBookings,
   reviewBooking,
+  checkInBooking,
+  getBookingById,
 };

@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import bookingService from '../../services/bookingService';
+import QrCodeModal from './components/QrCodeModal';
 import './MyBookingsPage.css';
 
 const MyBookingsPage = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedQrBooking, setSelectedQrBooking] = useState(null);
+  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
 
   useEffect(() => {
     fetchMyBookings();
@@ -38,6 +41,7 @@ const MyBookingsPage = () => {
     switch (status) {
       case 'PENDING': return 'status-pending';
       case 'APPROVED': return 'status-approved';
+      case 'CONFIRMED': return 'status-confirmed';
       case 'REJECTED': return 'status-rejected';
       case 'CANCELLED': return 'status-cancelled';
       default: return '';
@@ -91,6 +95,33 @@ const MyBookingsPage = () => {
                 <span className={`status-pill ${getStatusClass(booking.status)}`}>
                   {booking.status}
                 </span>
+                
+                {booking.checkedIn && (
+                  <span className="status-pill status-checked-in" style={{ 
+                    background: '#e0f2fe', color: '#0369a1', marginLeft: '8px', 
+                    fontWeight: 700, fontSize: '0.7rem', display: 'inline-flex', alignItems: 'center', gap: '4px' 
+                  }}>
+                    ✓ CHECKED IN
+                  </span>
+                )}
+
+                {(booking.status === 'APPROVED' || booking.status === 'CONFIRMED') && !booking.checkedIn && (
+                  <button 
+                    className="qr-btn"
+                    onClick={() => {
+                      setSelectedQrBooking(booking);
+                      setIsQrModalOpen(true);
+                    }}
+                    style={{
+                      background: '#f1f5f9', color: '#0f172a', border: '1px solid #e2e8f0',
+                      padding: '8px 16px', borderRadius: '8px', fontWeight: 600,
+                      cursor: 'pointer', marginTop: '12px', display: 'flex', 
+                      alignItems: 'center', gap: '8px', width: 'fit-content'
+                    }}
+                  >
+                    🚀 Show QR Code
+                  </button>
+                )}
                 {(booking.status === 'PENDING' || booking.status === 'APPROVED') && (
                   <button 
                     className="cancel-btn" 
@@ -109,6 +140,12 @@ const MyBookingsPage = () => {
           </div>
         )}
       </div>
+
+      <QrCodeModal 
+        isOpen={isQrModalOpen}
+        onClose={() => setIsQrModalOpen(false)}
+        booking={selectedQrBooking}
+      />
     </div>
   );
 };

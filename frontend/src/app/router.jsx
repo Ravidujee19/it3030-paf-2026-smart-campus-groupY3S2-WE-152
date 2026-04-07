@@ -19,6 +19,7 @@ import MaintenanceTicketingPage from "../pages/admin/MaintenanceTicketingPage";
 import NotificationsPage from "../pages/admin/NotificationsPage";
 import ResourceListPage from "../pages/resources/ResourceListPage";
 import MyBookingsPage from "../pages/bookings/MyBookingsPage";
+import VerificationPage from "../pages/admin/VerificationPage";
 
 const router = createBrowserRouter([
   {
@@ -69,6 +70,7 @@ const router = createBrowserRouter([
       { path: "users", element: <AdminPage /> },
       { path: "facilities", element: <FacilitiesAssetsPage /> },
       { path: "bookings", element: <BookingManagementPage /> },
+      { path: "verify", element: <VerificationPage /> },
       { path: "maintenance", element: <MaintenanceTicketingPage /> },
       { path: "notifications", element: <NotificationsPage /> },
     ]
@@ -92,6 +94,7 @@ const router = createBrowserRouter([
       { path: "", element: <StaffPage /> },
       { path: "facilities", element: <ResourceListPage /> },
       { path: "bookings", element: <MyBookingsPage /> },
+      { path: "verify", element: <VerificationPage /> },
     ]
   },
   {
