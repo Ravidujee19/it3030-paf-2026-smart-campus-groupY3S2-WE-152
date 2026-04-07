@@ -32,10 +32,15 @@
   font-size: 24px;
 }
 
+.admin-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.edit-item-btn,
 .delete-item-btn {
-  background: #fff5f5;
-  border: 1px solid #feb2b2;
-  color: #c53030;
+  background: white;
+  border: 1px solid #e2e8f0;
   width: 32px;
   height: 32px;
   border-radius: 8px;
@@ -44,14 +49,27 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-size: 1.1rem;
+  font-size: 1rem;
+}
+
+.edit-item-btn {
+  color: #6366f1;
+}
+
+.edit-item-btn:hover {
+  background: #f5f3ff;
+  border-color: #6366f1;
+  transform: translateY(-2px);
+}
+
+.delete-item-btn {
+  color: #ef4444;
 }
 
 .delete-item-btn:hover {
-  background: #feb2b2;
-  color: #742a2a;
-  transform: scale(1.1);
-  box-shadow: 0 4px 6px -1px rgba(229, 62, 62, 0.2);
+  background: #fef2f2;
+  border-color: #ef4444;
+  transform: translateY(-2px);
 }
 
 .status-badge {

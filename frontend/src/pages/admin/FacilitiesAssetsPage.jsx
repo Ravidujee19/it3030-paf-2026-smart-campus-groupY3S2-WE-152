@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ResourceListPage from '../resources/ResourceListPage';
-import CreateResourceModal from '../resources/components/CreateResourceModal';
+import ResourceModal from '../resources/components/ResourceModal';
 import './FacilitiesAssetsPage.css';
 
 export default function FacilitiesAssetsPage() {
@@ -31,10 +31,11 @@ export default function FacilitiesAssetsPage() {
         <ResourceListPage refreshTrigger={refreshTrigger} hideHeader={true} />
       </div>
 
-      <CreateResourceModal 
+      <ResourceModal 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)}
         onSuccess={handleCreateSuccess}
+        mode="CREATE"
       />
     </div>
   );

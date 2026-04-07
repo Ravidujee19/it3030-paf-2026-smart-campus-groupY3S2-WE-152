@@ -2,7 +2,7 @@ import React from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import './ResourceCard.css';
 
-const ResourceCard = ({ resource, onDelete }) => {
+const ResourceCard = ({ resource, onDelete, onEdit }) => {
   const { id, name, type, capacity, location, status } = resource;
   const { user } = useAuth();
   
@@ -22,10 +22,16 @@ const ResourceCard = ({ resource, onDelete }) => {
     }
   };
 
-  const handleDeleteClick = () => {
+  const handleDeleteClick = (e) => {
+    e.stopPropagation();
     if (window.confirm(`Are you sure you want to delete "${name}"?`)) {
       onDelete(id);
     }
+  };
+
+  const handleEditClick = (e) => {
+    e.stopPropagation();
+    onEdit();
   };
 
   return (
@@ -38,13 +44,22 @@ const ResourceCard = ({ resource, onDelete }) => {
           </span>
         </div>
         {isAdmin && (
-          <button 
-            className="delete-item-btn" 
-            onClick={handleDeleteClick}
-            title="Delete Resource"
-          >
-            🗑️
-          </button>
+          <div className="admin-actions">
+            <button 
+              className="edit-item-btn" 
+              onClick={handleEditClick}
+              title="Edit Resource"
+            >
+              ✏️
+            </button>
+            <button 
+              className="delete-item-btn" 
+              onClick={handleDeleteClick}
+              title="Delete Resource"
+            >
+              🗑️
+            </button>
+          </div>
         )}
       </div>
       <div className="resource-card-body">
