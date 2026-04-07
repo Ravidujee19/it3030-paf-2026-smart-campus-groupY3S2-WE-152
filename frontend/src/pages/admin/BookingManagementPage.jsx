@@ -68,35 +68,43 @@ const BookingManagementPage = () => {
   return (
     <div className="admin-bookings-page">
       <div className="admin-bookings-header">
-        <h1>Booking Requests</h1>
+        <h1>Booking Management</h1>
+        <p>Review and process facility access requests for the campus.</p>
       </div>
 
       <div className="admin-filter-bar">
         <div className="admin-filter-group">
-          <label>Status Filter</label>
+          <label>Filter by status</label>
           <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
-            <option value="">All Bookings</option>
-            <option value="PENDING">Pending</option>
+            <option value="">All Reservations</option>
+            <option value="PENDING">Pending Approval</option>
             <option value="APPROVED">Approved</option>
-            <option value="REJECTED">Rejected</option>
-            <option value="CANCELLED">Cancelled</option>
+            <option value="CONFIRMED">Confirmed Arrival</option>
+            <option value="REJECTED">Declined</option>
+            <option value="CANCELLED">User Cancelled</option>
           </select>
+        </div>
+        <div style={{ color: '#94a3b8', fontSize: '0.875rem', fontWeight: 600 }}>
+          Showing {bookings.length} requests
         </div>
       </div>
 
       <div className="admin-bookings-table-container">
         {loading ? (
-          <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>
+          <div style={{ padding: '80px', textAlign: 'center', color: '#64748b', fontWeight: 600 }}>
+            <div className="loading-spinner"></div>
+            Syncing database records...
+          </div>
         ) : (
           <table className="admin-bookings-table">
             <thead>
               <tr>
-                <th>Resource</th>
+                <th>Resource / Facility</th>
                 <th>Requestor</th>
-                <th>Date & Time</th>
-                <th>Purpose</th>
+                <th>Scheduled Window</th>
+                <th>Utilization Purpose</th>
                 <th>Status</th>
-                <th>Actions</th>
+                <th>Administrative Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -104,22 +112,26 @@ const BookingManagementPage = () => {
                 bookings.map((booking) => (
                   <tr key={booking.id}>
                     <td>
-                      <div style={{ fontWeight: 600 }}>{booking.resourceName}</div>
+                      <div style={{ fontWeight: 700, color: '#0f172a' }}>{booking.resourceName}</div>
+                      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>#{booking.id.toString().padStart(6, '0')}</div>
                     </td>
                     <td>
                       <div className="user-identity">
+                        <div className="user-avatar-circle">
+                          {booking.userName.charAt(0).toUpperCase()}
+                        </div>
                         <span className="user-identity-name">{booking.userName}</span>
                       </div>
                     </td>
                     <td>
-                      <div style={{ fontSize: '0.85rem' }}>{formatDate(booking.startTime)}</div>
-                      <div style={{ fontSize: '0.8rem', color: '#64748b' }}>
-                        {formatTime(booking.startTime)} - {formatTime(booking.endTime)}
+                      <div style={{ fontWeight: 600 }}>{formatDate(booking.startTime)}</div>
+                      <div style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '4px' }}>
+                        {formatTime(booking.startTime)} — {formatTime(booking.endTime)}
                       </div>
                     </td>
                     <td>
-                      <div style={{ maxWidth: '200px', fontSize: '0.875rem' }} title={booking.purpose}>
-                        {booking.purpose ? (booking.purpose.length > 50 ? booking.purpose.substring(0, 50) + '...' : booking.purpose) : 'No purpose provided'}
+                      <div style={{ maxWidth: '240px', fontSize: '0.875rem', color: '#475569', lineHeight: 1.5 }} title={booking.purpose}>
+                        {booking.purpose ? (booking.purpose.length > 60 ? booking.purpose.substring(0, 60) + '...' : booking.purpose) : 'No specific details provided'}
                       </div>
                     </td>
                     <td>
@@ -130,19 +142,27 @@ const BookingManagementPage = () => {
                     <td>
                       {booking.status === 'PENDING' ? (
                         <div className="admin-action-btns">
-                          <button className="approve-btn" onClick={() => handleApprove(booking.id)}>Approve</button>
-                          <button className="reject-btn" onClick={() => openRejectModal(booking)}>Reject</button>
+                          <button className="admin-btn approve-btn" onClick={() => handleApprove(booking.id)}>
+                            Approve
+                          </button>
+                          <button className="admin-btn reject-btn" onClick={() => openRejectModal(booking)}>
+                            Decline
+                          </button>
                         </div>
                       ) : (
-                        <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Processed</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#94a3b8', fontSize: '0.875rem', fontWeight: 600 }}>
+                          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
+                          Processed
+                        </div>
                       )}
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>
-                    No booking requests found.
+                  <td colSpan="6" style={{ textAlign: 'center', padding: '100px 40px', color: '#94a3b8' }}>
+                    <div style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '8px' }}>Clear Queue</div>
+                    No booking requests match your current filters.
                   </td>
                 </tr>
               )}
@@ -154,39 +174,49 @@ const BookingManagementPage = () => {
       {isRejectModalOpen && (
         <div className="reject-modal-overlay">
           <div className="reject-modal-content">
-            <h2 style={{ marginBottom: '16px', color: '#1e293b' }}>Reject Request</h2>
-            <p style={{ marginBottom: '8px', fontSize: '0.875rem', color: '#64748b' }}>
-              Resource: <strong>{selectedBooking?.resourceName}</strong>
+            <h2 style={{ marginBottom: '12px', color: '#0f172a', fontWeight: 800 }}>Reject Access Request</h2>
+            <p style={{ marginBottom: '24px', fontSize: '0.925rem', color: '#64748b', lineHeight: 1.5 }}>
+              You are declining the request for <strong>{selectedBooking?.resourceName}</strong>. Please provide a formal reason for the user.
             </p>
-            <div style={{ marginBottom: '24px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label htmlFor="rejectReason" style={{ fontSize: '0.875rem', fontWeight: 600, color: '#475569' }}>
-                Rejection Reason (Required)
-              </label>
+            
+            <div className="admin-filter-group" style={{ maxWidth: 'none', marginBottom: '32px' }}>
+              <label htmlFor="rejectReason">Formal Reason for Rejection</label>
               <textarea
                 id="rejectReason"
-                name="rejectReason"
                 style={{ 
-                  padding: '12px', 
-                  borderRadius: '8px', 
+                  padding: '16px', 
+                  borderRadius: '12px', 
                   border: '1px solid #e2e8f0', 
-                  background: '#ffffff', 
-                  minHeight: '120px',
+                  minHeight: '140px',
                   outline: 'none',
-                  fontSize: '0.95rem',
+                  fontSize: '1rem',
+                  lineHeight: 1.5,
                   width: '100%',
                   fontFamily: 'inherit',
-                  resize: 'vertical',
                   color: '#1e293b'
                 }}
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
-                placeholder="Ex: The requested resource is scheduled for maintenance."
+                placeholder="Ex: Facility unavailable due to scheduled maintenance or priority event."
                 autoFocus
               ></textarea>
             </div>
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-              <button className="approve-btn" style={{ background: '#f1f5f9', color: '#475569' }} onClick={() => setIsRejectModalOpen(false)}>Cancel</button>
-              <button className="reject-btn" onClick={handleRejectSubmit}>Confirm Reject</button>
+
+            <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-end' }}>
+              <button 
+                className="admin-btn" 
+                style={{ background: '#f8fafc', color: '#64748b', border: '1px solid #e2e8f0' }} 
+                onClick={() => setIsRejectModalOpen(false)}
+              >
+                Cancel
+              </button>
+              <button 
+                className="admin-btn" 
+                style={{ background: '#ef4444', color: 'white' }}
+                onClick={handleRejectSubmit}
+              >
+                Confirm Decline
+              </button>
             </div>
           </div>
         </div>
