@@ -158,21 +158,30 @@ const BookingManagementPage = () => {
             <p style={{ marginBottom: '8px', fontSize: '0.875rem', color: '#64748b' }}>
               Resource: <strong>{selectedBooking?.resourceName}</strong>
             </p>
-            <div className="admin-filter-group" style={{ marginBottom: '24px' }}>
-              <label>Rejection Reason (Required)</label>
+            <div style={{ marginBottom: '24px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label htmlFor="rejectReason" style={{ fontSize: '0.875rem', fontWeight: 600, color: '#475569' }}>
+                Rejection Reason (Required)
+              </label>
               <textarea
+                id="rejectReason"
+                name="rejectReason"
                 style={{ 
                   padding: '12px', 
                   borderRadius: '8px', 
                   border: '1px solid #e2e8f0', 
-                  background: '#f8fafc', 
-                  minHeight: '100px',
+                  background: '#ffffff', 
+                  minHeight: '120px',
                   outline: 'none',
-                  fontSize: '0.9rem'
+                  fontSize: '0.95rem',
+                  width: '100%',
+                  fontFamily: 'inherit',
+                  resize: 'vertical',
+                  color: '#1e293b'
                 }}
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
                 placeholder="Ex: The requested resource is scheduled for maintenance."
+                autoFocus
               ></textarea>
             </div>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>

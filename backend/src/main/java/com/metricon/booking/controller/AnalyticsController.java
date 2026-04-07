@@ -19,15 +19,10 @@ public class AnalyticsController {
 
     @GetMapping("/summary")
     public Map<String, Object> getAnalyticsSummary() {
-        try {
-            return Map.of(
-                "topResources", analyticsService.getTopResources(),
-                "peakHours", analyticsService.getPeakHours(),
-                "stats", analyticsService.getDashboardStats()
-            );
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
+        return Map.of(
+            "topResources", analyticsService.getTopResources(),
+            "peakHours", analyticsService.getPeakHours(),
+            "stats", analyticsService.getDashboardStats()
+        );
     }
 }
