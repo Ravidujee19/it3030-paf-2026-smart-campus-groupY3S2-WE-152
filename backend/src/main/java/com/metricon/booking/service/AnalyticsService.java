@@ -4,6 +4,7 @@ import com.metricon.booking.entity.Booking;
 import com.metricon.booking.repository.BookingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AnalyticsService {
 
     private final BookingRepository bookingRepository;
@@ -19,8 +21,9 @@ public class AnalyticsService {
     public Map<String, Long> getTopResources() {
         List<Booking> allBookings = bookingRepository.findAll();
         
-        // Count bookings per resource name
+        // Count bookings per resource name, filtering out nulls
         return allBookings.stream()
+                .filter(b -> b.getResource() != null && b.getResource().getName() != null)
                 .collect(Collectors.groupingBy(b -> b.getResource().getName(), Collectors.counting()))
                 .entrySet().stream()
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
@@ -36,8 +39,9 @@ public class AnalyticsService {
     public Map<Integer, Long> getPeakHours() {
         List<Booking> allBookings = bookingRepository.findAll();
         
-        // Count bookings per start hour (0-23)
+        // Count bookings per start hour (0-23), filtering out null start times
         Map<Integer, Long> hourCounts = allBookings.stream()
+                .filter(b -> b.getStartTime() != null)
                 .collect(Collectors.groupingBy(b -> b.getStartTime().getHour(), Collectors.counting()));
                 
         // Ensure all hours are represented for a complete chart if needed

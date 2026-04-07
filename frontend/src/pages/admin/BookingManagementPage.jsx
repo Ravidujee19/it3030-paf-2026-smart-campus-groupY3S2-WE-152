@@ -100,7 +100,7 @@ const BookingManagementPage = () => {
               </tr>
             </thead>
             <tbody>
-              {bookings.length > 0 ? (
+              {bookings?.length > 0 ? (
                 bookings.map((booking) => (
                   <tr key={booking.id}>
                     <td>
@@ -119,7 +119,7 @@ const BookingManagementPage = () => {
                     </td>
                     <td>
                       <div style={{ maxWidth: '200px', fontSize: '0.875rem' }} title={booking.purpose}>
-                        {booking.purpose.length > 50 ? booking.purpose.substring(0, 50) + '...' : booking.purpose}
+                        {booking.purpose ? (booking.purpose.length > 50 ? booking.purpose.substring(0, 50) + '...' : booking.purpose) : 'No purpose provided'}
                       </div>
                     </td>
                     <td>
