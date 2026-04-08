@@ -68,14 +68,10 @@ export default function StaffLayout() {
           <h2 className="admin-header-title">Welcome, Staff Member</h2>
           
           <div className="admin-header-user">
-            <Link to="/profile" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
-              <span className="user-name-text">{user?.name || "Staff"}</span>
-              <AvatarCard 
-                src={user?.profilePicture} 
-                alt={user?.name || "Staff"} 
-                size="md" 
-              />
-            </Link>
+            <span>{user?.name || "Staff"}</span>
+            <div className="admin-avatar" style={{ backgroundColor: '#4F709C' }}>
+              {(user?.name || "S").charAt(0).toUpperCase()}
+            </div>
             <button 
               onClick={handleLogout} 
               className="btn-primary"
