@@ -26,11 +26,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/home",
-    element: (
-      <ProtectedRoute>
-        <HomePage />
-      </ProtectedRoute>
-    ),
+    element: <HomePage />,
   },
   {
     path: "/profile",
