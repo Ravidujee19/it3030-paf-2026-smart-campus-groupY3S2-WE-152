@@ -24,7 +24,17 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(name = "profile_picture", nullable = true)
     private String profilePicture;
+
+    @Column(nullable = true)
+    private String phone;
+
+    @Column(nullable = true)
+    private String department;
+
+    @Column(nullable = true)
+    private String bio;
 
     @Column(nullable = false)
     private boolean enabled = true;
@@ -61,6 +71,30 @@ public class User {
 
     public void setProfilePicture(String profilePicture) {
         this.profilePicture = profilePicture;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
     }
 
     public boolean isEnabled() {

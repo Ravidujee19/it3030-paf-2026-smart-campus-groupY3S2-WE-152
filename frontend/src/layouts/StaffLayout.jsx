@@ -1,6 +1,7 @@
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import "../styles/adminLayout.css"; // Reuse styling variables
+import AvatarCard from "../components/common/AvatarCard";
+import "../styles/adminLayout.css"; 
 
 const Icons = {
   Dashboard: () => (
