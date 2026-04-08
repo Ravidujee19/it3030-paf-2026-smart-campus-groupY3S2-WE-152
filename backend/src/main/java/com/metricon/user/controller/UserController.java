@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.metricon.user.dto.UserMeResponse;
+import com.metricon.user.dto.UserProfileUpdateRequest;
 import com.metricon.user.dto.UserRoleUpdateRequest;
 import com.metricon.user.service.UserService;
 
@@ -31,6 +32,13 @@ public class UserController {
     public UserMeResponse getMe(@AuthenticationPrincipal OAuth2User principal) {
         String email = principal.getAttribute("email");
         return userService.getCurrentUser(email);
+    }
+    
+    @PutMapping("/me")
+    public UserMeResponse updateMe(@AuthenticationPrincipal OAuth2User principal, @RequestBody UserProfileUpdateRequest request) {
+    	String email = principal.getAttribute("email");
+    	Long userId = userService.getCurrentUser(email).getId();
+    	return userService.updateUserProfile(userId, request);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

@@ -11,4 +11,6 @@ public interface UserService {
     List<UserMeResponse> getAllUsers();
     void updateUserRole(Long userId, String roleName);
     void deleteUser(Long userId);
+
+    UserMeResponse updateUserProfile(Long userId, com.metricon.user.dto.UserProfileUpdateRequest request);
 }
