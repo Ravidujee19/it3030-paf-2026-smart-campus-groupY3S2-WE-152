@@ -170,6 +170,60 @@ public class TicketService {
     }
 
     // ──────────────────────────────────────────────
+    // UPDATE TICKET DETAILS
+    // ──────────────────────────────────────────────
+
+    /**
+     * Updates editable fields of a ticket (title, description, category, priority, location, etc.).
+     */
+    @Transactional
+    public Ticket updateTicket(Long ticketId, Ticket updatedFields) {
+        Ticket ticket = getTicketById(ticketId);
+
+        if (updatedFields.getTitle() != null) {
+            ticket.setTitle(updatedFields.getTitle());
+        }
+        if (updatedFields.getDescription() != null) {
+            ticket.setDescription(updatedFields.getDescription());
+        }
+        if (updatedFields.getCategory() != null) {
+            ticket.setCategory(updatedFields.getCategory());
+        }
+        if (updatedFields.getPriority() != null) {
+            ticket.setPriority(updatedFields.getPriority());
+        }
+        if (updatedFields.getLocation() != null) {
+            ticket.setLocation(updatedFields.getLocation());
+        }
+        if (updatedFields.getResourceName() != null) {
+            ticket.setResourceName(updatedFields.getResourceName());
+        }
+        if (updatedFields.getContactEmail() != null) {
+            ticket.setContactEmail(updatedFields.getContactEmail());
+        }
+        if (updatedFields.getContactPhone() != null) {
+            ticket.setContactPhone(updatedFields.getContactPhone());
+        }
+
+        return ticketRepository.save(ticket);
+    }
+
+    // ──────────────────────────────────────────────
+    // DELETE
+    // ──────────────────────────────────────────────
+
+    /**
+     * Deletes a ticket by its ID. Cascading will remove associated comments and attachments.
+     *
+     * @throws ResourceNotFoundException if the ticket does not exist
+     */
+    @Transactional
+    public void deleteTicket(Long ticketId) {
+        Ticket ticket = getTicketById(ticketId);
+        ticketRepository.delete(ticket);
+    }
+
+    // ──────────────────────────────────────────────
     // HELPER: Status transition validation
     // ──────────────────────────────────────────────
 
