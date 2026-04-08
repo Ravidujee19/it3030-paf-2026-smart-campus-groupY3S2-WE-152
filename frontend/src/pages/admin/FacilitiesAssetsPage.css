@@ -1,73 +1,81 @@
+/* Professional Facilities & Assets Management Hub */
 .facilities-assets-wrapper {
-  padding: 0;
+  padding: 48px 40px;
   max-width: 1400px;
   margin: 0 auto;
+  min-height: 100vh;
+  background-color: #f8fafc;
+  animation: fadeIn 0.4s ease-out;
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding: 2.5rem;
-  background: white;
-  border-radius: 1.5rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  border: 1px solid #edf2f7;
+  align-items: flex-start;
+  margin-bottom: 48px;
+  gap: 24px;
 }
 
 .header-text h1 {
-  font-size: 2.2rem;
+  font-size: 2.75rem;
   font-weight: 800;
-  color: #1a202c;
-  margin-bottom: 0.5rem;
-  letter-spacing: -0.025em;
-}
-
-.header-text p {
-  color: #718096;
-  font-size: 1.1rem;
-}
-
-.btn-add-resource {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-  color: white;
-  border: none;
-  padding: 1rem 1.75rem;
-  border-radius: 1rem;
-  font-weight: 700;
-  font-size: 1rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.btn-add-resource:hover {
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 20px 25px -5px rgba(99, 102, 241, 0.4);
-}
-
-.btn-add-resource:active {
-  transform: translateY(0) scale(0.98);
-}
-
-.plus-icon {
-  font-size: 1.4rem;
+  color: #0f172a;
+  letter-spacing: -0.03em;
+  margin: 0 0 12px 0;
   line-height: 1;
 }
 
+.header-text p {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #64748b;
+  max-width: 600px;
+}
+
+/* Professional Create Button */
+.btn-add-resource {
+  padding: 14px 24px;
+  background: #0f172a;
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2);
+}
+
+.btn-add-resource:hover {
+  background: #1e293b;
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.3);
+}
+
+.plus-icon {
+  font-size: 1.5rem;
+  color: #38bdf8;
+  font-weight: 400;
+}
+
 .content-area {
-  margin-top: 2rem;
+  margin-top: 16px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 768px) {
   .page-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1.5rem;
-    padding: 1.5rem;
+  }
+  .facilities-assets-wrapper {
+    padding: 24px;
   }
 }

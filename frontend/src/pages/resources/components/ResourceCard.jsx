@@ -44,7 +44,9 @@ const ResourceCard = ({ resource, onDelete, onEdit }) => {
     <div className="resource-card">
       <div className="resource-card-header">
         <div className="header-left">
-          <span className="resource-icon">{getTypeIcon(type)}</span>
+          <div className="resource-icon-wrapper">
+             {getTypeIcon(type)}
+          </div>
           <span className={`status-badge ${getStatusClass(status)}`}>
             {status}
           </span>
@@ -52,14 +54,14 @@ const ResourceCard = ({ resource, onDelete, onEdit }) => {
         {isAdmin && (
           <div className="admin-actions">
             <button 
-              className="edit-item-btn" 
+              className="action-btn edit-item-btn" 
               onClick={handleEditClick}
               title="Edit Resource"
             >
               ✏️
             </button>
             <button 
-              className="delete-item-btn" 
+              className="action-btn delete-item-btn" 
               onClick={handleDeleteClick}
               title="Delete Resource"
             >
@@ -70,7 +72,7 @@ const ResourceCard = ({ resource, onDelete, onEdit }) => {
       </div>
       <div className="resource-card-body">
         <h3 className="resource-name">{name}</h3>
-        <p className="resource-type">{type.replace('_', ' ')}</p>
+        <p className="resource-type">{type.replace(/_/g, ' ')}</p>
         <div className="resource-details">
           <div className="detail-item">
             <span className="detail-icon">👥</span>
@@ -85,8 +87,7 @@ const ResourceCard = ({ resource, onDelete, onEdit }) => {
       <div className="resource-card-footer">
         {!isAdmin ? (
           <button 
-            className="view-details-btn" 
-            style={{ background: 'linear-gradient(135deg, #6366f1, #818cf8)' }}
+            className="view-details-btn book-now-btn" 
             onClick={() => setIsBookingModalOpen(true)}
           >
             Book Now

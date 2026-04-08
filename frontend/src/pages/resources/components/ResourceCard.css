@@ -1,121 +1,178 @@
+/* Professional Resource Card - Software Engineer Design */
+:root {
+  --primary-blue: #2563eb;
+  --primary-blue-hover: #1d4ed8;
+  --bg-slate: #f8fafc;
+  --text-slate-900: #0f172a;
+  --text-slate-600: #475569;
+  --text-slate-400: #94a3b8;
+  --border-slate-200: #e2e8f0;
+  --shadow-card: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-card-hover: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
 .resource-card {
   background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 20px;
-  transition: all 0.3s ease;
+  border: 1px solid var(--border-slate-200);
+  border-radius: 24px;
+  padding: 24px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow-card);
+  position: relative;
+  overflow: hidden;
+}
+
+.resource-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: transparent;
+  transition: background 0.3s ease;
 }
 
 .resource-card:hover {
-  transform: translateY(-5px);
-  border-color: #6c5ce7;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transform: translateY(-8px);
+  border-color: var(--primary-blue);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.resource-card:hover::before {
+  background: var(--primary-blue);
 }
 
 .resource-card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .header-left {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  gap: 12px;
 }
+
+.resource-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  background: var(--bg-slate);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  border: 1px solid var(--border-slate-200);
+}
+
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-badge::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.status-active {
+  background: #dcfce7;
+  color: #166534;
+}
+.status-active::before { background: #22c55e; }
+
+.status-inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.status-inactive::before { background: #ef4444; }
 
 .admin-actions {
   display: flex;
   gap: 8px;
 }
 
-.edit-item-btn,
-.delete-item-btn {
+.action-btn {
   background: white;
-  border: 1px solid #e2e8f0;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  border: 1px solid var(--border-slate-200);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 1rem;
 }
 
-.edit-item-btn {
-  color: #6366f1;
-}
-
 .edit-item-btn:hover {
-  background: #f5f3ff;
-  border-color: #6366f1;
-  transform: translateY(-2px);
-}
-
-.delete-item-btn {
-  color: #ef4444;
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #3b82f6;
+  transform: scale(1.1);
 }
 
 .delete-item-btn:hover {
   background: #fef2f2;
   border-color: #ef4444;
-  transform: translateY(-2px);
-}
-.status-badge {
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
+  color: #ef4444;
+  transform: scale(1.1);
 }
 
-.status-active {
-  background: rgba(46, 213, 115, 0.2);
-  color: #2ed573;
-}
-
-.status-inactive {
-  background: rgba(255, 71, 87, 0.2);
-  color: #ff4757;
+.resource-card-body {
+  margin-bottom: 24px;
 }
 
 .resource-name {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1e293b;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-slate-900);
+  letter-spacing: -0.025em;
   margin: 0 0 4px 0;
 }
 
 .resource-type {
-  font-size: 0.875rem;
-  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-slate-400);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   margin-bottom: 16px;
-  text-transform: capitalize;
 }
 
 .resource-details {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 20px;
+  gap: 12px;
 }
 
 .detail-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-size: 0.9375rem;
-  color: #475569;
+  font-weight: 600;
+  color: var(--text-slate-600);
 }
 
 .detail-icon {
-  font-size: 16px;
+  width: 20px;
+  color: var(--text-slate-400);
 }
 
 .resource-card-footer {
@@ -124,16 +181,35 @@
 
 .view-details-btn {
   width: 100%;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 14px;
+  border-radius: 14px;
   border: none;
-  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  background: var(--primary-blue);
   color: white;
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  letter-spacing: 0.0125em;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
 }
 
 .view-details-btn:hover {
-  opacity: 0.9;
+  background: var(--primary-blue-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+}
+
+.book-now-btn {
+  background: var(--text-slate-900);
+}
+
+.book-now-btn:hover {
+  background: #1e293b;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

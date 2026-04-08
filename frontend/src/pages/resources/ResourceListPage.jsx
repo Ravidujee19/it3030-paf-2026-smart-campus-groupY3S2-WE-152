@@ -70,37 +70,63 @@ const ResourceListPage = ({ refreshTrigger, hideHeader = false }) => {
       <section className="filter-section">
         <div className="filter-grid">
           <div className="filter-group">
-            <label htmlFor="type">Resource Type</label>
-            <select name="type" id="type" value={filters.type} onChange={handleFilterChange}>
-              <option value="">All Types</option>
-              <option value="LECTURE_HALL">Lecture Hall</option>
-              <option value="LAB">Lab</option>
-              <option value="MEETING_ROOM">Meeting Room</option>
-              <option value="EQUIPMENT">Equipment</option>
-            </select>
+            <label htmlFor="type">Resource Category</label>
+            <div className="input-with-icon">
+              <span className="filter-icon">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+              </span>
+              <select name="type" id="type" value={filters.type} onChange={handleFilterChange}>
+                <option value="">All Categories</option>
+                <option value="LECTURE_HALL">Lecture Halls</option>
+                <option value="LAB">Research Labs</option>
+                <option value="MEETING_ROOM">Meeting Rooms</option>
+                <option value="EQUIPMENT">Specialized Equipment</option>
+              </select>
+            </div>
           </div>
+          
           <div className="filter-group">
-            <label htmlFor="capacity">Min Capacity</label>
-            <input
-              type="number"
-              name="capacity"
-              id="capacity"
-              placeholder="e.g. 20"
-              value={filters.capacity}
-              onChange={handleFilterChange}
-            />
+            <label htmlFor="capacity">Minimum Capacity</label>
+            <div className="input-with-icon">
+              <span className="filter-icon">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+              </span>
+              <input
+                type="number"
+                name="capacity"
+                id="capacity"
+                placeholder="e.g. 50"
+                value={filters.capacity}
+                onChange={handleFilterChange}
+              />
+            </div>
           </div>
+          
           <div className="filter-group">
-            <label htmlFor="location">Location</label>
-            <input
-              type="text"
-              name="location"
-              id="location"
-              placeholder="Search by building..."
-              value={filters.location}
-              onChange={handleFilterChange}
-            />
+            <label htmlFor="location">Facility Location</label>
+            <div className="input-with-icon">
+              <span className="filter-icon">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+              </span>
+              <input
+                type="text"
+                name="location"
+                id="location"
+                placeholder="Search by building name..."
+                value={filters.location}
+                onChange={handleFilterChange}
+              />
+            </div>
           </div>
+
+          <button 
+            className="clear-filters-btn" 
+            onClick={() => setFilters({ type: '', capacity: '', location: '' })}
+            title="Reset all filters"
+          >
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+            Reset
+          </button>
         </div>
       </section>
 
