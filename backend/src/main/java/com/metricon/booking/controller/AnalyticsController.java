@@ -6,8 +6,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/analytics")
@@ -22,6 +21,10 @@ public class AnalyticsController {
         return Map.of(
             "topResources", analyticsService.getTopResources(),
             "peakHours", analyticsService.getPeakHours(),
+            "heatmap", analyticsService.getBookingHeatmap(),
+            "locations", analyticsService.getLocationAnalytics(),
+            "efficiency", analyticsService.getCapacityEfficiency(),
+            "insights", analyticsService.getSmartInsights(),
             "stats", analyticsService.getDashboardStats()
         );
     }

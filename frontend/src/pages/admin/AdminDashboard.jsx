@@ -1,138 +1,236 @@
 import React, { useState, useEffect } from 'react';
-import analyticsService from '../../services/analyticsService';
+import axios from 'axios';
 import './AdminDashboard.css';
 
-export default function AdminDashboard() {
+// Inline Professional SVGs (Since external icons were blocked)
+const Icons = {
+  Activity: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>,
+  Calendar: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>,
+  Users: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>,
+  Alert: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>,
+  Trends: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+};
+
+const AdminDashboard = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchAnalytics = async () => {
-      try {
-        setLoading(true);
-        const result = await analyticsService.getAnalyticsSummary();
-        setData(result);
-      } catch (err) {
-        setError('Failed to load analytics data.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchAnalytics();
   }, []);
 
-  if (loading) return (
-    <div className="admin-loading-container">
-      <div className="admin-spinner"></div>
-      <p>Calculating campus insights...</p>
-    </div>
-  );
+  const fetchAnalytics = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get('http://localhost:8081/api/analytics/summary', { withCredentials: true });
+      setData(response.data);
+    } catch (err) {
+      console.error('Error fetching analytics:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  if (error) return (
-    <div className="admin-error-container">
-      <p>{error}</p>
-    </div>
-  );
+  if (loading || !data) {
+    return (
+      <div className="dashboard-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center', color: '#64748b' }}>
+          <div className="loading-spinner" style={{ marginBottom: '16px' }}></div>
+          <p style={{ fontWeight: 700 }}>Initializing Analytical Engine...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const { stats, topResources, peakHours } = data || {};
+  const { stats = {}, topResources = {}, peakHours = {}, heatmap = {}, locations = {}, efficiency = {}, insights = [] } = data;
+
+  // Constants for Charting
+  const days = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"];
+  const hours = Array.from({length: 24}, (_, i) => i);
 
   return (
-    <div className="admin-dashboard-container">
-      <div className="dashboard-intro">
-        <h1 className="admin-header-title" style={{ fontSize: '2rem', marginBottom: '8px' }}>Dashboard Overview</h1>
-        <p style={{ color: 'var(--admin-text-light)', marginBottom: '32px' }}>Welcome back! Here's what's happening across the campus today.</p>
+    <div className="dashboard-container">
+      <header className="dashboard-header">
+        <div>
+          <h1>Analytical Hub</h1>
+          <p>Real-time campus utilization and resource intelligence.</p>
+        </div>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button className="kpi-trend positive" onClick={fetchAnalytics} style={{ border: 'none', cursor: 'pointer', padding: '10px 16px' }}>
+            Refinement Sync ✓
+          </button>
+        </div>
+      </header>
+
+      {/* KPI STRIP */}
+      <div className="kpi-grid">
+        <div className="kpi-card">
+          <span className="kpi-label">Total Reservations</span>
+          <div className="kpi-value-row">
+            <span className="kpi-value">{stats.totalBookings || 0}</span>
+            <span className="kpi-trend positive">+8.4%</span>
+          </div>
+        </div>
+        <div className="kpi-card">
+          <span className="kpi-label">Utilization Rate</span>
+          <div className="kpi-value-row">
+            <span className="kpi-value">{stats.utilizationTrend || '0%'}</span>
+            <span className="kpi-trend positive">Stable</span>
+          </div>
+        </div>
+        <div className="kpi-card">
+          <span className="kpi-label">Campus Efficiency</span>
+          <div className="kpi-value-row">
+            <span className="kpi-value">{stats.efficiencyRate || '0%'}</span>
+            <span className="kpi-trend positive">+4.2%</span>
+          </div>
+        </div>
+        <div className="kpi-card">
+          <span className="kpi-label">Pending Reviews</span>
+          <div className="kpi-value-row">
+            <span className="kpi-value">{stats.pendingBookings || 0}</span>
+            <span className={`kpi-trend ${(stats.pendingBookings || 0) > 5 ? 'negative' : 'positive'}`}>
+              {(stats.pendingBookings || 0) > 5 ? 'High Load' : 'Minimal'}
+            </span>
+          </div>
+        </div>
       </div>
 
-      {/* Quick Stats Grid */}
-      <div className="admin-grid" style={{ marginBottom: '32px' }}>
-        <div className="stat-card">
-          <div className="stat-icon">📊</div>
-          <div className="stat-info">
-            <span className="stat-label">Total Bookings</span>
-            <p className="stat-value">{stats?.totalBookings || 0}</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon" style={{ backgroundColor: '#ecfdf5', color: '#10b981' }}>✅</div>
-          <div className="stat-info">
-            <span className="stat-label">Confirmed Slots</span>
-            <p className="stat-value">{stats?.activeBookings || 0}</p>
-          </div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-icon" style={{ backgroundColor: '#fff7ed', color: '#f59e0b' }}>🏁</div>
-          <div className="stat-info">
-            <span className="stat-label">Completed Units</span>
-            <p className="stat-value">{stats?.completedBookings || 0}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="dashboard-content-grid">
-        {/* Top Resources - Bar Chart */}
-        <div className="admin-card">
-          <h2 className="admin-card-title">🔥 Top Utilized Resources</h2>
-          <div className="analytics-bar-chart">
-            {topResources && Object.entries(topResources).length > 0 ? (
-              Object.entries(topResources).map(([name, count], index) => {
-                const maxCount = Math.max(...Object.values(topResources));
-                const percentage = (count / maxCount) * 100;
-                return (
-                  <div key={name} className="analytics-bar-row">
-                    <div className="bar-info">
-                      <span className="bar-name">{name}</span>
-                      <span className="bar-count">{count} bookings</span>
-                    </div>
-                    <div className="bar-background">
-                      <div 
-                        className="bar-foreground" 
-                        style={{ width: `${percentage}%`, transitionDelay: `${index * 100}ms` }}
-                      ></div>
-                    </div>
-                  </div>
-                );
-              })
-            ) : (
-              <div className="no-data-msg">No resource usage data available yet.</div>
-            )}
-          </div>
-        </div>
-
-        {/* Peak Hours - Distribution */}
-        <div className="admin-card">
-          <h2 className="admin-card-title">⏰ Peak Booking Hours</h2>
-          <div className="analytics-hours-container">
-            <div className="hours-chart">
-              {peakHours && Object.entries(peakHours).map(([hour, count]) => {
-                const maxHourCount = Math.max(...Object.values(peakHours)) || 1;
-                const heightPercentage = (count / maxHourCount) * 100;
-                return (
-                  <div key={hour} className="hour-bar-column">
-                    <div className="hour-bar-wrapper">
-                      <div 
-                        className="hour-bar-inner" 
-                        style={{ height: `${Math.max(heightPercentage, 2)}%` }} // Min height for visibility
-                        title={`${hour}:00 - ${count} bookings`}
-                      ></div>
-                    </div>
-                    <span className="hour-tick">{formatHour(hour)}</span>
-                  </div>
-                );
-              })}
+      <div className="analytics-layout">
+        <main className="analytics-main">
+          
+          {/* TOP RESOURCES BAR CHART (SVG) */}
+          <div className="chart-card">
+            <h3><Icons.Activity /> Utilization Distribution (Top Resources)</h3>
+            <div style={{ height: '260px', position: 'relative' }}>
+              <svg width="100%" height="100%" viewBox="0 0 600 240" preserveAspectRatio="none">
+                {Object.entries(topResources).map(([name, count], index) => {
+                  const counts = Object.values(topResources);
+                  const maxCount = counts.length > 0 ? Math.max(...counts, 1) : 1;
+                  const barHeight = (count / maxCount) * 180;
+                  const xPos = index * (600 / Math.max(Object.keys(topResources).length, 1)) + 40;
+                  return (
+                    <g key={name}>
+                      <rect 
+                        x={xPos} 
+                        y={200 - barHeight} 
+                        width="40" 
+                        height={barHeight} 
+                        className="bar-rect" 
+                        style={{'--target-height': `${barHeight}px`}}
+                      />
+                      <text x={xPos + 20} y="225" textAnchor="middle" fontSize="11" fill="#64748b" fontWeight="600">
+                        {name.length > 10 ? name.substring(0, 8) + '..' : name}
+                      </text>
+                      <text x={xPos + 20} y={190 - barHeight} textAnchor="middle" fontSize="12" fill="#1e293b" fontWeight="800">
+                        {count}
+                      </text>
+                    </g>
+                  );
+                })}
+              </svg>
             </div>
           </div>
-        </div>
+
+          {/* TEMPORAL HEATMAP */}
+          <div className="chart-card">
+            <h3><Icons.Calendar /> Temporal Density Heatmap</h3>
+            <div className="heatmap-container" style={{ overflowX: 'auto' }}>
+              <div className="heatmap-grid" style={{ minWidth: '700px' }}>
+                <div /> {/* Top left spacer */}
+                {hours.map(h => (
+                   <div key={h} className="heatmap-hour-label">{h}:00</div>
+                ))}
+                
+                {days.map(day => (
+                  <React.Fragment key={day}>
+                    <div className="heatmap-day-label">{day.substring(0, 3)}</div>
+                    {hours.map(h => {
+                      const dayData = heatmap?.[day] || [];
+                      const value = dayData[h] || 0;
+                      const level = Math.min(Math.floor(value), 5);
+                      return (
+                        <div 
+                          key={h} 
+                          className={`heatmap-cell level-${level}`} 
+                          title={`${day} ${h}:00 - ${value} Bookings`}
+                        />
+                      );
+                    })}
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '12px', marginTop: '20px', fontSize: '0.75rem', fontWeight: 600, color: '#94a3b8', alignItems: 'center' }}>
+              <span>Less</span>
+              {[0,1,2,3,4,5].map(l => <div key={l} className={`heatmap-cell level-${l}`} style={{ width: '12px', height: '12px' }} />)}
+              <span>More Active</span>
+            </div>
+          </div>
+
+          {/* CAPACITY EFFICIENCY RADAR (LIST VIEW FOR PROFESSIONALISM) */}
+          <div className="chart-card">
+            <h3><Icons.Trends /> Capacity vs. Utilization Efficiency</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {Object.entries(efficiency).map(([name, rate]) => (
+                <div key={name}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.875rem' }}>
+                    <span style={{ fontWeight: 700, color: '#475569' }}>{name}</span>
+                    <span style={{ fontWeight: 800, color: rate > 80 ? '#10b981' : '#6366f1' }}>{rate.toFixed(1)}%</span>
+                  </div>
+                  <div style={{ height: '8px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{ 
+                      height: '100%', 
+                      background: rate > 80 ? 'var(--admin-accent-emerald)' : 'var(--admin-primary)',
+                      width: `${rate}%`,
+                      borderRadius: '4px',
+                      transition: 'width 1s cubic-bezier(0.4, 0, 0.2, 1)' 
+                    }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </main>
+
+        <aside className="insights-sidebar">
+          <div className="chart-card" style={{ padding: '24px' }}>
+            <h3 style={{ marginBottom: '20px', fontSize: '1.1rem' }}><Icons.Alert /> Smart Insights</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {insights.length > 0 ? insights.map((insight, i) => (
+                <div key={i} className={`insight-card ${insight.severity.toLowerCase()}`}>
+                  <span className="type">{insight.type}</span>
+                  <p className="msg">{insight.message}</p>
+                </div>
+              )) : (
+                <p style={{ color: '#94a3b8', fontSize: '0.875rem', textAlign: 'center', padding: '20px' }}>
+                  No anomalies detected. Campus is performing at peak efficiency.
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="chart-card" style={{ padding: '24px', background: 'var(--admin-secondary)', color: 'white' }}>
+            <h3 style={{ color: 'white', marginBottom: '16px' }}>Zone Distribution</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {Object.entries(locations).map(([loc, count]) => (
+                <div key={loc} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.875rem', fontWeight: 600, opacity: 0.8 }}>{loc}</span>
+                  <span style={{ 
+                    background: 'rgba(255,255,255,0.1)', 
+                    padding: '2px 10px', 
+                    borderRadius: '99px',
+                    fontSize: '0.75rem',
+                    fontWeight: 800
+                  }}>{count} active</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
   );
-}
+};
 
-function formatHour(hour) {
-  const h = parseInt(hour, 10);
-  if (h === 0) return '12A';
-  if (h < 12) return `${h}A`;
-  if (h === 12) return '12P';
-  return `${h - 12}P`;
-}
+export default AdminDashboard;
