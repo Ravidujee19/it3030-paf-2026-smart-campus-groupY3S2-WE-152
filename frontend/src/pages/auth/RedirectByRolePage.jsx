@@ -24,6 +24,10 @@ function RedirectByRolePage() {
     return <Navigate to="/staff" replace />;
   }
 
+  if (user.role === "STUDENT") {
+    return <Navigate to="/student" replace />;
+  }
+
   if (user.role === "PENDING") {
     return <Navigate to="/pending-approval" replace />;
   }

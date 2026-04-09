@@ -20,6 +20,7 @@ import NotificationsPage from "../pages/admin/NotificationsPage";
 import ResourceListPage from "../pages/resources/ResourceListPage";
 import MyBookingsPage from "../pages/bookings/MyBookingsPage";
 import VerificationPage from "../pages/admin/VerificationPage";
+import StudentDashboard from "../pages/common/StudentDashboard";
 
 const router = createBrowserRouter([
   {
@@ -76,6 +77,14 @@ const router = createBrowserRouter([
     element: (
       <RoleRoute allowedRoles={["TECHNICIAN", "ADMIN"]}>
         <TechnicianPage />
+      </RoleRoute>
+    ),
+  },
+  {
+    path: "/student",
+    element: (
+      <RoleRoute allowedRoles={["STUDENT"]}>
+        <StudentDashboard />
       </RoleRoute>
     ),
   },

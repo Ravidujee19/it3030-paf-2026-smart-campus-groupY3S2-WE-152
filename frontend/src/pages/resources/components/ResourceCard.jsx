@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import BookingRequestModal from '../../bookings/components/BookingRequestModal';
+import ResourceDetailModal from './ResourceDetailModal';
 import './ResourceCard.css';
 
 const ResourceCard = ({ resource, onDelete, onEdit }) => {
   const { id, name, type, capacity, location, status } = resource;
   const { user } = useAuth();
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   
   const isAdmin = user?.role === 'ADMIN';
+  const isStudent = user?.role === 'STUDENT';
 
   const getStatusClass = (status) => {
     return status === 'ACTIVE' ? 'status-active' : 'status-inactive';
@@ -83,16 +86,35 @@ const ResourceCard = ({ resource, onDelete, onEdit }) => {
         </div>
       </div>
       <div className="resource-card-footer">
-        {!isAdmin ? (
+        {isStudent ? (
           <button 
             className="view-details-btn" 
-            style={{ background: 'linear-gradient(135deg, #6366f1, #818cf8)' }}
-            onClick={() => setIsBookingModalOpen(true)}
+            style={{ background: 'linear-gradient(135deg, #4b5563, #6b7280)' }}
+            onClick={() => setIsDetailModalOpen(true)}
           >
-            Book Now
+            View Details
           </button>
+        ) : !isAdmin ? (
+          <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+            <button 
+              className="view-details-btn" 
+              style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0', flex: 1 }}
+              onClick={() => setIsDetailModalOpen(true)}
+            >
+              Details
+            </button>
+            <button 
+              className="view-details-btn" 
+              style={{ background: 'linear-gradient(135deg, #6366f1, #818cf8)', flex: 2 }}
+              onClick={() => setIsBookingModalOpen(true)}
+            >
+              Book Now
+            </button>
+          </div>
         ) : (
-          <button className="view-details-btn">View Details</button>
+          <button className="view-details-btn" onClick={() => setIsDetailModalOpen(true)}>
+            View Details
+          </button>
         )}
       </div>
 
@@ -101,6 +123,12 @@ const ResourceCard = ({ resource, onDelete, onEdit }) => {
         onClose={() => setIsBookingModalOpen(false)}
         resource={resource}
         onSuccess={handleBookingSuccess}
+      />
+
+      <ResourceDetailModal
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        resource={resource}
       />
     </div>
   );
