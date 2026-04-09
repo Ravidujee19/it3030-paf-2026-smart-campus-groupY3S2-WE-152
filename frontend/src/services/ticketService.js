@@ -114,6 +114,28 @@ export const deleteComment = async (commentId, userId) => {
   return response.data;
 };
 
+// ──────────────────────────────────────────────
+// ATTACHMENT ENDPOINTS
+// ──────────────────────────────────────────────
+
+/**
+ * POST /api/tickets/:ticketId/attachments — Upload attachments for a ticket.
+ */
+export const uploadAttachments = async (ticketId, files, userId) => {
+  const formData = new FormData();
+  files.forEach((file) => {
+    formData.append('files', file);
+  });
+  formData.append('userId', userId);
+
+  const response = await API.post(`/api/tickets/${ticketId}/attachments`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+
 export default {
   getAllTickets,
   getTicketById,
@@ -127,4 +149,5 @@ export default {
   addComment,
   editComment,
   deleteComment,
+  uploadAttachments,
 };

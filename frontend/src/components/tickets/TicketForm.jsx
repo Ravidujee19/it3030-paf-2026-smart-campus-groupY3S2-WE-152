@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { createTicket } from '../../services/ticketService';
+import { useAuth } from '../../context/AuthContext';
+import { createTicket, uploadAttachments } from '../../services/ticketService';
 import './TicketForm.css';
 
 const CATEGORIES = [
@@ -23,6 +24,9 @@ const PRIORITIES = [
 const MAX_ATTACHMENTS = 3;
 
 const TicketForm = ({ onSuccess, onCancel }) => {
+  const { user } = useAuth();
+  const currentUserId = user?.id || user?.userId || 1; // Fallback to 1
+  
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -32,7 +36,7 @@ const TicketForm = ({ onSuccess, onCancel }) => {
     resourceName: '',
     contactEmail: '',
     contactPhone: '',
-    createdByUserId: 1, // TODO: Replace with logged-in user ID from auth context
+    createdByUserId: currentUserId,
   });
 
   const [attachments, setAttachments] = useState([]);
@@ -74,7 +78,19 @@ const TicketForm = ({ onSuccess, onCancel }) => {
     setError(null);
 
     try {
-      await createTicket(formData);
+      // Step 1: Create the ticket
+      const createdTicket = await createTicket(formData);
+
+      // Step 2: Upload attachments if any were selected
+      if (attachments.length > 0 && createdTicket.id) {
+        try {
+          await uploadAttachments(createdTicket.id, attachments, formData.createdByUserId);
+        } catch (uploadErr) {
+          console.warn('Ticket created but attachment upload failed:', uploadErr);
+          // Don't fail the whole submission — ticket was already created
+        }
+      }
+
       setSuccess(true);
       setFormData({
         title: '',
@@ -85,7 +101,7 @@ const TicketForm = ({ onSuccess, onCancel }) => {
         resourceName: '',
         contactEmail: '',
         contactPhone: '',
-        createdByUserId: 1,
+        createdByUserId: currentUserId,
       });
       setAttachments([]);
 
