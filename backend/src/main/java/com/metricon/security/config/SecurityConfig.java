@@ -89,7 +89,7 @@ public class SecurityConfig {
             ))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/", "/error", "/login/**", "/oauth2/**").permitAll()
-                .requestMatchers("/api/tickets/**").permitAll() // TODO: Remove after testing — temporary Postman bypass
+                .requestMatchers("/api/tickets", "/api/tickets/**").permitAll() // TODO: Remove after testing — temporary Postman bypass
                 .requestMatchers("/api/users/me").authenticated()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/technician/**").hasAnyRole("TECHNICIAN", "ADMIN")
