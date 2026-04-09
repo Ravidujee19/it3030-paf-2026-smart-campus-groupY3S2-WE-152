@@ -1,0 +1,152 @@
+.maintenance-page {
+  padding: 0;
+  width: 100%;
+}
+
+/* ──────────────────────────────────────────────── */
+/* PAGE HEADER (List View Only) */
+/* ──────────────────────────────────────────────── */
+
+.maintenance-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.page-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.page-title-icon {
+  font-size: 2.2rem;
+  margin-left: -4px;
+}
+
+.page-subtitle {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ──────────────────────────────────────────────── */
+/* NEW TICKET BUTTON */
+/* ──────────────────────────────────────────────── */
+
+.btn-new-ticket {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.3);
+}
+
+.btn-new-ticket:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(108, 92, 231, 0.4);
+}
+
+.btn-new-ticket:active {
+  transform: translateY(0);
+}
+
+.btn-plus {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+/* ──────────────────────────────────────────────── */
+/* CREATE VIEW WRAPPER */
+/* ──────────────────────────────────────────────── */
+
+.create-view-wrapper {
+  animation: fadeIn 0.3s ease;
+}
+
+.create-view-header {
+  margin-bottom: 24px;
+}
+
+.btn-back-to-list {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-back-to-list:hover {
+  background: #e2e8f0;
+  color: #1e293b;
+}
+
+.back-arrow-icon {
+  font-size: 1.1rem;
+}
+
+/* ──────────────────────────────────────────────── */
+/* ANIMATIONS */
+/* ──────────────────────────────────────────────── */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ──────────────────────────────────────────────── */
+/* RESPONSIVE */
+/* ──────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .maintenance-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .btn-new-ticket {
+    width: 100%;
+    justify-content: center;
+  }
+}
