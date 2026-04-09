@@ -4,11 +4,9 @@ import BookingRequestModal from '../../bookings/components/BookingRequestModal';
 import ResourceDetailModal from './ResourceDetailModal';
 import './ResourceCard.css';
 
-const ResourceCard = ({ resource, onDelete, onEdit }) => {
+const ResourceCard = ({ resource, onDelete, onEdit, onBook, onViewDetails }) => {
   const { id, name, type, capacity, location, status } = resource;
   const { user } = useAuth();
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   
   const isAdmin = user?.role === 'ADMIN';
   const isStudent = user?.role === 'STUDENT';
@@ -37,10 +35,6 @@ const ResourceCard = ({ resource, onDelete, onEdit }) => {
   const handleEditClick = (e) => {
     e.stopPropagation();
     onEdit();
-  };
-
-  const handleBookingSuccess = () => {
-    alert('Booking request submitted successfully! An administrator will review it shortly.');
   };
 
   return (
@@ -90,7 +84,7 @@ const ResourceCard = ({ resource, onDelete, onEdit }) => {
           <button 
             className="view-details-btn" 
             style={{ background: 'linear-gradient(135deg, #4b5563, #6b7280)' }}
-            onClick={() => setIsDetailModalOpen(true)}
+            onClick={() => onViewDetails && onViewDetails(resource)}
           >
             View Details
           </button>
@@ -99,37 +93,24 @@ const ResourceCard = ({ resource, onDelete, onEdit }) => {
             <button 
               className="view-details-btn" 
               style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0', flex: 1 }}
-              onClick={() => setIsDetailModalOpen(true)}
+              onClick={() => onViewDetails && onViewDetails(resource)}
             >
               Details
             </button>
             <button 
               className="view-details-btn" 
               style={{ background: 'linear-gradient(135deg, #6366f1, #818cf8)', flex: 2 }}
-              onClick={() => setIsBookingModalOpen(true)}
+              onClick={() => onBook && onBook(resource)}
             >
               Book Now
             </button>
           </div>
         ) : (
-          <button className="view-details-btn" onClick={() => setIsDetailModalOpen(true)}>
+          <button className="view-details-btn" onClick={() => onViewDetails && onViewDetails(resource)}>
             View Details
           </button>
         )}
       </div>
-
-      <BookingRequestModal 
-        isOpen={isBookingModalOpen}
-        onClose={() => setIsBookingModalOpen(false)}
-        resource={resource}
-        onSuccess={handleBookingSuccess}
-      />
-
-      <ResourceDetailModal
-        isOpen={isDetailModalOpen}
-        onClose={() => setIsDetailModalOpen(false)}
-        resource={resource}
-      />
     </div>
   );
 };
