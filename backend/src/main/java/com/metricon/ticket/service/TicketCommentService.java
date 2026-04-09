@@ -14,7 +14,8 @@ import java.util.List;
 
 /**
  * Service layer for ticket comments.
- * Enforces ownership rules: only the comment author can edit or delete their own comment.
+ * Enforces ownership rules: only the comment author can edit or delete their
+ * own comment.
  */
 @Service
 public class TicketCommentService {
@@ -24,8 +25,8 @@ public class TicketCommentService {
     private final UserRepository userRepository;
 
     public TicketCommentService(TicketCommentRepository commentRepository,
-                                TicketRepository ticketRepository,
-                                UserRepository userRepository) {
+            TicketRepository ticketRepository,
+            UserRepository userRepository) {
         this.commentRepository = commentRepository;
         this.ticketRepository = ticketRepository;
         this.userRepository = userRepository;
@@ -136,8 +137,7 @@ public class TicketCommentService {
     private void validateOwnership(TicketComment comment, Long userId) {
         if (!comment.getAuthor().getId().equals(userId)) {
             throw new SecurityException(
-                    "Access denied: User " + userId + " is not the owner of comment " + comment.getId()
-            );
+                    "Access denied: User " + userId + " is not the owner of comment " + comment.getId());
         }
     }
 }
