@@ -191,43 +191,45 @@ const AdminDashboard = () => {
               ))}
             </div>
           </div>
+
+          {/* NEW BOTTOM INSIGHTS GRID */}
+          <div className="bottom-insights-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px' }}>
+            <div className="chart-card" style={{ padding: '24px', marginBottom: 0 }}>
+              <h3 style={{ marginBottom: '20px', fontSize: '1.1rem' }}><Icons.Alert /> Smart Insights</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {insights.length > 0 ? insights.map((insight, i) => (
+                  <div key={i} className={`insight-card ${insight.severity.toLowerCase()}`}>
+                    <span className="type">{insight.type}</span>
+                    <p className="msg">{insight.message}</p>
+                  </div>
+                )) : (
+                  <p style={{ color: '#94a3b8', fontSize: '0.875rem', textAlign: 'center', padding: '20px' }}>
+                    No anomalies detected. Campus is performing at peak efficiency.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="chart-card" style={{ padding: '24px', background: 'var(--admin-secondary)', color: 'white', marginBottom: 0 }}>
+              <h3 style={{ color: 'white', marginBottom: '16px' }}>Zone Distribution</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {Object.entries(locations).map(([loc, count]) => (
+                  <div key={loc} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.875rem', fontWeight: 600, opacity: 0.8 }}>{loc}</span>
+                    <span style={{ 
+                      background: 'rgba(255,255,255,0.1)', 
+                      padding: '2px 10px', 
+                      borderRadius: '99px',
+                      fontSize: '0.75rem',
+                      fontWeight: 800
+                    }}>{count} active</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </main>
 
-        <aside className="insights-sidebar">
-          <div className="chart-card" style={{ padding: '24px' }}>
-            <h3 style={{ marginBottom: '20px', fontSize: '1.1rem' }}><Icons.Alert /> Smart Insights</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {insights.length > 0 ? insights.map((insight, i) => (
-                <div key={i} className={`insight-card ${insight.severity.toLowerCase()}`}>
-                  <span className="type">{insight.type}</span>
-                  <p className="msg">{insight.message}</p>
-                </div>
-              )) : (
-                <p style={{ color: '#94a3b8', fontSize: '0.875rem', textAlign: 'center', padding: '20px' }}>
-                  No anomalies detected. Campus is performing at peak efficiency.
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div className="chart-card" style={{ padding: '24px', background: 'var(--admin-secondary)', color: 'white' }}>
-            <h3 style={{ color: 'white', marginBottom: '16px' }}>Zone Distribution</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {Object.entries(locations).map(([loc, count]) => (
-                <div key={loc} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.875rem', fontWeight: 600, opacity: 0.8 }}>{loc}</span>
-                  <span style={{ 
-                    background: 'rgba(255,255,255,0.1)', 
-                    padding: '2px 10px', 
-                    borderRadius: '99px',
-                    fontSize: '0.75rem',
-                    fontWeight: 800
-                  }}>{count} active</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </aside>
       </div>
     </div>
   );
