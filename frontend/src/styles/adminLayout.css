@@ -183,10 +183,17 @@
 
 /* Content Area */
 .admin-content {
-  flex-grow: 1;
+  flex: 1 0 auto; /* Allow content to define its height */
   padding: 40px;
-  overflow-y: auto;
   color: var(--admin-text-dark);
+}
+
+.admin-scroll-area {
+  flex-grow: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  scroll-behavior: smooth;
 }
 
 /* Card Component */
@@ -453,4 +460,41 @@
 .admin-input:focus, .admin-select:focus {
   border-color: var(--admin-primary) !important;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+}
+
+/* Footer Styling */
+.admin-footer {
+  padding: 24px 40px;
+  background-color: var(--admin-card-bg);
+  border-top: 1px solid var(--admin-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--admin-text-light);
+  font-size: 0.85rem;
+  margin-top: auto;
+}
+
+.admin-footer-links {
+  display: flex;
+  gap: 24px;
+}
+
+.admin-footer-link {
+  color: var(--admin-text-light);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.admin-footer-link:hover {
+  color: var(--admin-primary);
+}
+
+.admin-main-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-content {
+  flex: 1 0 auto;
 }

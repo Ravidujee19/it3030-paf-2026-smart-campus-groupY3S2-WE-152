@@ -105,9 +105,22 @@ export default function AdminLayout() {
           </div>
         </header>
 
-        <main className="admin-content">
-          <Outlet />
-        </main>
+        <div className="admin-scroll-area">
+          <main className="admin-content">
+            <Outlet />
+          </main>
+
+          <footer className="admin-footer">
+            <div className="admin-footer-copy">
+              &copy; {new Date().getFullYear()} Smart Campus Management System. All rights reserved.
+            </div>
+            <div className="admin-footer-links">
+              <Link to="/admin" className="admin-footer-link">Dashboard</Link>
+              <Link to="/admin/notifications" className="admin-footer-link">Support</Link>
+              <span className="admin-footer-link">v1.2.4-stable</span>
+            </div>
+          </footer>
+        </div>
       </div>
     </div>
   );
