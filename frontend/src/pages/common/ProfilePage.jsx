@@ -36,21 +36,20 @@ function ProfilePage() {
 
   return (
     <div className="profile-container">
-      <div style={{ marginBottom: "1.5rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div style={{ marginBottom: "2rem" }}>
         <button 
           onClick={handleGoBack} 
-          className="btn-secondary" 
-          style={{ display: "flex", alignItems: "center", gap: "0.5rem", border: "none", background: "transparent", color: "var(--admin-text-dark)", padding: 0 }}
+          className="profile-nav-btn"
         >
-          <svg style={{width:'20px', height:'20px'}} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg style={{width:'18px', height:'18px'}} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
           </svg>
-          Back to Dashboard
+          Return to Dashboard
         </button>
       </div>
 
       {successMessage && (
-        <div className="form-message success" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div className="profile-alert success">
           <svg style={{width:'20px', height:'20px'}} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>

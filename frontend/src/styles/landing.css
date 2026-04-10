@@ -62,8 +62,12 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 6rem 2rem 4rem 2rem;
+  padding: 8rem 2rem 6rem 2rem;
   position: relative;
+  background-image: linear-gradient(to bottom, rgba(248, 250, 252, 0.8), rgba(248, 250, 252, 0.95)), url('../assets/campus-hero.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
 .home-hero::before {
@@ -97,6 +101,7 @@
 .home-hero h1 span {
   background: linear-gradient(135deg, #2563eb, #0ea5e9);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 

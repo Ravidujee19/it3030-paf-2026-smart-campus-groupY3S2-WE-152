@@ -15,7 +15,7 @@ const Icons = {
 };
 
 function HomePage() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   const handleDashboardRedirect = () => {
@@ -27,9 +27,16 @@ function HomePage() {
       navigate('/staff');
     } else if (user.role === 'TECHNICIAN') {
       navigate('/technician');
+    } else if (user.role === 'STUDENT') {
+      navigate('/student');
     } else {
       navigate('/profile');
     }
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
   };
 
   return (
@@ -37,15 +44,32 @@ function HomePage() {
       {/* Navigation */}
       <nav className="landing-navbar">
         <Link to="/home" className="landing-logo">
-          <div className="landing-logo-icon">S</div>
-          <span>Smart Campus</span>
+          <div className="landing-logo-icon">M</div>
+          <span>Metricon</span>
         </Link>
         <div className="landing-nav-actions">
           {user ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <span style={{ fontSize: '0.95rem', fontWeight: 500 }}>Hello, {user.name}</span>
+              <span className="user-greeting" style={{ fontSize: '0.95rem', fontWeight: 500, color: '#64748b' }}>
+                Hello, {user.name}
+              </span>
               <button onClick={handleDashboardRedirect} className="btn-primary" style={{ padding: '8px 20px', borderRadius: '8px' }}>
                 Dashboard
+              </button>
+              <button 
+                onClick={handleLogout} 
+                className="btn-secondary" 
+                style={{ 
+                  padding: '8px 16px', 
+                  borderRadius: '8px', 
+                  background: 'transparent', 
+                  border: '1px solid #e2e8f0',
+                  color: '#475569',
+                  fontWeight: 600,
+                  fontSize: '0.9rem'
+                }}
+              >
+                Logout
               </button>
             </div>
           ) : (

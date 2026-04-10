@@ -1,6 +1,5 @@
-<<<<<<< Updated upstream
-=======
 import { createBrowserRouter } from "react-router-dom";
+
 import LoginPage from "../pages/auth/LoginPage";
 import RedirectByRolePage from "../pages/auth/RedirectByRolePage";
 import HomePage from "../pages/common/HomePage";
@@ -10,25 +9,29 @@ import StaffPage from "../pages/common/StaffPage";
 import UnauthorizedPage from "../pages/common/UnauthorizedPage";
 import ProfilePage from "../pages/common/ProfilePage";
 import PendingApprovalPage from "../pages/common/PendingApprovalPage";
+
 import ProtectedRoute from "../routes/ProtectedRoute";
 import RoleRoute from "../routes/RoleRoute";
+
 import AdminLayout from "../layouts/AdminLayout";
 import StaffLayout from "../layouts/StaffLayout";
+import StudentLayout from "../layouts/StudentLayout";
+
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import FacilitiesAssetsPage from "../pages/admin/FacilitiesAssetsPage";
 import BookingManagementPage from "../pages/admin/BookingManagementPage";
 import MaintenanceTicketingPage from "../pages/admin/MaintenanceTicketingPage";
 import NotificationsPage from "../pages/admin/NotificationsPage";
+import VerificationPage from "../pages/admin/VerificationPage";
+
 import ResourceListPage from "../pages/resources/ResourceListPage";
 import MyBookingsPage from "../pages/bookings/MyBookingsPage";
-import VerificationPage from "../pages/admin/VerificationPage";
+
 import StudentDashboard from "../pages/common/StudentDashboard";
 
 const router = createBrowserRouter([
-  {
-    path: "/login",
-    element: <LoginPage />,
-  },
+  { path: "/login", element: <LoginPage /> },
+
   {
     path: "/",
     element: (
@@ -37,26 +40,20 @@ const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
-  {
-    path: "/home",
-    element: <HomePage />,
-  },
+
+  { path: "/home", element: <HomePage /> },
+
   {
     path: "/profile",
-    element: (
-      <ProtectedRoute>
-        <ProfilePage />
-      </ProtectedRoute>
-    ),
+    element: <ProtectedRoute><ProfilePage /></ProtectedRoute>,
   },
+
   {
     path: "/pending-approval",
-    element: (
-      <ProtectedRoute>
-        <PendingApprovalPage />
-      </ProtectedRoute>
-    ),
+    element: <ProtectedRoute><PendingApprovalPage /></ProtectedRoute>,
   },
+
+  // ADMIN
   {
     path: "/admin",
     element: (
@@ -65,32 +62,18 @@ const router = createBrowserRouter([
       </RoleRoute>
     ),
     children: [
-      { path: "", element: <AdminDashboard /> },
+      { index: true, element: <AdminDashboard /> },
       { path: "users", element: <AdminPage /> },
       { path: "facilities", element: <FacilitiesAssetsPage /> },
       { path: "bookings", element: <BookingManagementPage /> },
       { path: "verify", element: <VerificationPage /> },
       { path: "maintenance", element: <MaintenanceTicketingPage /> },
       { path: "notifications", element: <NotificationsPage /> },
-      { path: "profile", element: <ProfilePage /> }
-    ]
+      { path: "profile", element: <ProfilePage /> },
+    ],
   },
-  {
-    path: "/technician",
-    element: (
-      <RoleRoute allowedRoles={["TECHNICIAN", "ADMIN"]}>
-        <TechnicianPage />
-      </RoleRoute>
-    ),
-  },
-  {
-    path: "/student",
-    element: (
-      <RoleRoute allowedRoles={["STUDENT"]}>
-        <StudentDashboard />
-      </RoleRoute>
-    ),
-  },
+
+  // STAFF
   {
     path: "/staff",
     element: (
@@ -99,19 +82,38 @@ const router = createBrowserRouter([
       </RoleRoute>
     ),
     children: [
-      { path: "", element: <StaffPage /> },
+      { index: true, element: <StaffPage /> },
       { path: "facilities", element: <ResourceListPage /> },
       { path: "bookings", element: <MyBookingsPage /> },
       { path: "verify", element: <VerificationPage /> },
       { path: "notifications", element: <NotificationsPage /> },
-      { path: "profile", element: <ProfilePage /> }
-    ]
+      { path: "profile", element: <ProfilePage /> },
+    ],
   },
+
   {
-    path: "/unauthorized",
-    element: <UnauthorizedPage />,
+    path: "/student",
+    element: (
+      <RoleRoute allowedRoles={["STUDENT"]}>
+        <StudentLayout />
+      </RoleRoute>
+    ),
+    children: [
+      { index: true, element: <StudentDashboard /> },
+      { path: "profile", element: <ProfilePage /> },
+    ],
   },
+
+  {
+    path: "/technician",
+    element: (
+      <RoleRoute allowedRoles={["TECHNICIAN", "ADMIN"]}>
+        <TechnicianPage />
+      </RoleRoute>
+    ),
+  },
+
+  { path: "/unauthorized", element: <UnauthorizedPage /> },
 ]);
 
 export default router;
->>>>>>> Stashed changes
