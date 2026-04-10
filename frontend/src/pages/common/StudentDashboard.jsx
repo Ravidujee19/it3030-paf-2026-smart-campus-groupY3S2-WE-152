@@ -2,7 +2,8 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import ResourceListPage from '../resources/ResourceListPage';
 import ProfileHeader from '../../components/common/ProfileHeader';
-import './StaffDashboard.css'; // Reusing layout styles for consistency
+import studentHero from '../../assets/student-hero.png';
+import './StaffDashboard.css';
 
 const StudentDashboard = () => {
   const { user, logout } = useAuth();
@@ -11,11 +12,16 @@ const StudentDashboard = () => {
     <div className="staff-dashboard">
       <div className="dashboard-top-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '24px', marginBottom: '24px' }}>
         {/* Left: Hero Section */}
-        <header className="dashboard-hero" style={{ 
-          background: 'linear-gradient(135deg, #4338ca 0%, #6366f1 100%)',
-          margin: 0,
-          borderRadius: '20px'
-        }}>
+        <header 
+          className="dashboard-hero" 
+          style={{ 
+            backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.6)), url(${studentHero})`,
+            margin: 0,
+            borderRadius: '20px',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        >
           <div className="hero-content">
             <h1>Student Portal</h1>
             <p>Welcome, <strong>{user?.name || 'Student'}</strong>. Explore campus resources and check availability.</p>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import adminHero from '../../assets/admin-hero.png';
 import './AdminDashboard.css';
 
 // Inline Professional SVGs (Since external icons were blocked)
@@ -50,13 +51,24 @@ const AdminDashboard = () => {
 
   return (
     <div className="dashboard-container">
-      <header className="dashboard-header">
+      <header 
+        className="dashboard-header"
+        style={{ 
+          backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.5), rgba(15, 23, 42, 0.75)), url(${adminHero})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          padding: '4rem 3rem',
+          borderRadius: '24px',
+          marginBottom: '2rem',
+          color: 'white'
+        }}
+      >
         <div>
-          <h1>Analytical Hub</h1>
-          <p>Real-time campus utilization and resource intelligence.</p>
+          <h1 style={{ color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>Analytical Hub</h1>
+          <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '1.2rem' }}>Real-time campus utilization and resource intelligence.</p>
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
-          <button className="kpi-trend positive" onClick={fetchAnalytics} style={{ border: 'none', cursor: 'pointer', padding: '10px 16px' }}>
+          <button className="kpi-trend positive" onClick={fetchAnalytics} style={{ border: 'none', cursor: 'pointer', padding: '10px 24px', borderRadius: '12px' }}>
             Refinement Sync ✓
           </button>
         </div>

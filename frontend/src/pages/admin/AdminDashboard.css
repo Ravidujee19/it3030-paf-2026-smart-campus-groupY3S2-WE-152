@@ -53,17 +53,20 @@
 }
 
 .kpi-card {
-  background: var(--admin-surface);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
   padding: 24px;
   border-radius: 20px;
-  border: 1px solid var(--admin-border);
-  box-shadow: var(--admin-shadow-sm);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .kpi-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--admin-shadow-lg);
+  transform: translateY(-5px);
+  background: white;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
   border-color: var(--admin-primary);
 }
 
@@ -107,12 +110,17 @@
 }
 
 .chart-card {
-  background: var(--admin-surface);
+  background: white;
   padding: 32px;
   border-radius: 24px;
-  border: 1px solid var(--admin-border);
-  box-shadow: var(--admin-shadow-sm);
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   margin-bottom: 24px;
+  transition: box-shadow 0.3s;
+}
+
+.chart-card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
 }
 
 .chart-card h3 {
