@@ -128,29 +128,17 @@ function AdminPage() {
           <div style={{ position: "relative" }}>
             <input 
               type="text" 
+              className="admin-input"
               placeholder="Search by name or email..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={{
-                padding: "8px 12px",
-                borderRadius: "8px",
-                border: "1px solid var(--admin-border)",
-                backgroundColor: "#fff",
-                fontSize: "0.9rem",
-                width: "280px"
-              }}
+              style={{ width: "280px" }}
             />
           </div>
           <select 
+            className="admin-select"
             value={filterRole}
             onChange={(e) => setFilterRole(e.target.value)}
-            style={{
-              padding: "8px 12px",
-              borderRadius: "8px",
-              border: "1px solid var(--admin-border)",
-              backgroundColor: "#fff",
-              fontSize: "0.9rem"
-            }}
           >
             <option value="ALL">All Roles</option>
             <option value="ADMIN">Admins</option>
@@ -226,12 +214,7 @@ function AdminPage() {
                       className="admin-select"
                       value={selectedRoles[user.id] || user.role}
                       onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                      style={{
-                        padding: "6px 10px",
-                        borderRadius: "6px",
-                        border: "1px solid var(--admin-border)",
-                        fontSize: "0.85rem"
-                      }}
+                      style={{ padding: "6px 10px", fontSize: "0.85rem" }}
                     >
                       <option value="STUDENT">STUDENT</option>
                       <option value="STAFF">STAFF</option>
