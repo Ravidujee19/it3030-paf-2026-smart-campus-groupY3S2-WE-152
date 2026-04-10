@@ -1,0 +1,16 @@
+frontend/node_modules/
+frontend/.vite/
+frontend/dist/
+frontend/build/
+
+backend/target/
+*.log
+
+.env
+*.env
+
+.DS_Store
+Thumbs.db
+
+.vscode/
+.idea/
