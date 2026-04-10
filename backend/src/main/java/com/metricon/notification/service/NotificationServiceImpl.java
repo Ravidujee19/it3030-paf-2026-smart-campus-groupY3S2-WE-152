@@ -2,8 +2,10 @@ package com.metricon.notification.service;
 
 import java.util.List;
 
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import com.metricon.common.enums.NotificationType;
 import com.metricon.notification.dto.NotificationResponse;
 import com.metricon.notification.entity.Notification;
 import com.metricon.notification.repository.NotificationRepository;
@@ -15,11 +17,14 @@ public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public NotificationServiceImpl(NotificationRepository notificationRepository,
-                                   UserRepository userRepository) {
+                                   UserRepository userRepository,
+                                   SimpMessagingTemplate messagingTemplate) {
         this.notificationRepository = notificationRepository;
         this.userRepository = userRepository;
+        this.messagingTemplate = messagingTemplate;
     }
 
     @Override
@@ -48,9 +53,28 @@ public class NotificationServiceImpl implements NotificationService {
         notificationRepository.saveAll(notifications);
     }
 
+    @Override
+    public void createNotification(String userEmail, String title, String message, NotificationType type) {
+        userRepository.findByEmail(userEmail).ifPresent(user -> {
+            Notification notification = new Notification();
+            notification.setUser(user);
+            notification.setTitle(title);
+            notification.setMessage(message);
+            notification.setType(type);
+
+            Notification saved = notificationRepository.save(notification);
+            NotificationResponse dto = mapToDto(saved);
+            messagingTemplate.convertAndSendToUser(
+                    userEmail,
+                    "/queue/notifications",
+                    dto
+            );
+        });
+    }
+
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found: " + email));
     }
 
     private NotificationResponse mapToDto(Notification n) {
