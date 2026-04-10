@@ -162,22 +162,23 @@
 
 /* Header */
 .admin-header {
-  height: 72px;
-  background-color: var(--admin-card-bg);
-  border-bottom: 1px solid var(--admin-border);
+  height: 88px;
+  background-color: #f0f7ff; /* Professional Light Blue */
+  border-bottom: 1px solid #dbeafe;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 40px;
-  z-index: 5;
+  z-index: 40;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.05);
 }
 
 .admin-header-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--admin-text-dark);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e40af; /* Darker blue for contrast */
   margin: 0;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.02em;
 }
 
 .admin-header-user {
@@ -193,31 +194,68 @@
 }
 
 .user-name-text {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: var(--admin-text-dark);
 }
 
 .user-role-text {
-  font-size: 0.75rem;
-  color: var(--admin-text-light);
+  font-size: 0.7rem;
+  color: #3b82f6;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
+  font-weight: 700;
 }
 
 .admin-avatar {
   background-color: var(--admin-primary);
   color: #fff;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: 2px solid #fff;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
+}
+
+.admin-bell-btn {
+  color: #64748b;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border-radius: 10px;
+  transition: all 0.2s;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+.admin-bell-btn:hover {
+  background: #f8fafc;
+  color: var(--admin-primary);
+  border-color: #cbd5e1;
+}
+
+.admin-bell-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background-color: var(--admin-danger);
+  color: white;
+  font-size: 10px;
+  height: 18px;
+  width: 18px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  font-size: 1rem;
-  border: 2px solid #fff;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  font-weight: 900;
+  border: 2px solid #f0f7ff;
 }
 
 /* Content Area */
