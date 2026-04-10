@@ -12,6 +12,7 @@ import ProtectedRoute from "../routes/ProtectedRoute";
 import RoleRoute from "../routes/RoleRoute";
 import AdminLayout from "../layouts/AdminLayout";
 import StaffLayout from "../layouts/StaffLayout";
+import StudentLayout from "../layouts/StudentLayout";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import FacilitiesAssetsPage from "../pages/admin/FacilitiesAssetsPage";
 import BookingManagementPage from "../pages/admin/BookingManagementPage";
@@ -85,9 +86,13 @@ const router = createBrowserRouter([
     path: "/student",
     element: (
       <RoleRoute allowedRoles={["STUDENT"]}>
-        <StudentDashboard />
+        <StudentLayout />
       </RoleRoute>
     ),
+    children: [
+      { path: "", element: <StudentDashboard /> },
+      { path: "profile", element: <ProfilePage /> }
+    ]
   },
   {
     path: "/staff",
