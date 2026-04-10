@@ -1,10 +1,3 @@
-<<<<<<< Updated upstream
-function TechnicianPage() {
-  return (
-    <div style={{ padding: "2rem" }}>
-      <h1>Technician Dashboard</h1>
-      <p>Technician and admin can access this page.</p>
-=======
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { getTicketsByAssignee, updateTicketStatus } from '../../services/ticketService';
@@ -205,13 +198,10 @@ function TechnicianPage() {
           })}
         </div>
       )}
->>>>>>> Stashed changes
     </div>
   );
 }
 
-<<<<<<< Updated upstream
-=======
 const styles = {
   page: {
     minHeight: '100vh',
@@ -351,5 +341,4 @@ const styles = {
   },
 };
 
->>>>>>> Stashed changes
 export default TechnicianPage;
