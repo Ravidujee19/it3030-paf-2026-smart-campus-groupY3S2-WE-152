@@ -72,6 +72,13 @@ public class NotificationServiceImpl implements NotificationService {
         });
     }
 
+    @Override
+    public void createNotificationForRole(com.metricon.common.enums.RoleName roleName, String title, String message, NotificationType type) {
+        userRepository.findByRoleName(roleName).forEach(user -> {
+            createNotification(user.getEmail(), title, message, type);
+        });
+    }
+
     private User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found: " + email));
