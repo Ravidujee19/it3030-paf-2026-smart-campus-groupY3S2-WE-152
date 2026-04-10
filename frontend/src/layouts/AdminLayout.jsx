@@ -1,6 +1,7 @@
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import AvatarCard from "../components/common/AvatarCard";
+import NotificationDropdown from "../components/notifications/NotificationDropdown";
 import "../styles/adminLayout.css";
 const Icons = {
   Dashboard: () => (
@@ -79,10 +80,26 @@ export default function AdminLayout() {
           <h2 className="admin-header-title">Admin Hub</h2>
           
           <div className="admin-header-user">
+<<<<<<< Updated upstream
             <span>{user?.name || "Admin"}</span>
             <div className="admin-avatar">
               {(user?.name || "A").charAt(0).toUpperCase()}
             </div>
+=======
+            <NotificationDropdown userRole="ADMIN" />
+
+            <Link to="/admin/profile" className="admin-header-user-clickable" title="View Profile">
+              <div className="user-name-wrapper">
+                <span className="user-name-text">{user?.name || "Admin"}</span>
+                <span className="user-role-text">Administrator</span>
+              </div>
+              
+              <div className="admin-avatar">
+                {(user?.name || "A").charAt(0).toUpperCase()}
+              </div>
+            </Link>
+            
+>>>>>>> Stashed changes
             <button 
               onClick={handleLogout} 
               className="btn-primary"
