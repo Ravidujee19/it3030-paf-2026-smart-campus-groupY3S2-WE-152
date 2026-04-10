@@ -1,0 +1,16 @@
+package com.metricon.user.dto;
+
+public class UserRoleUpdateRequest {
+    private String role;
+
+    public UserRoleUpdateRequest() {
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+}
