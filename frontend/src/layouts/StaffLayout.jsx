@@ -40,10 +40,10 @@ export default function StaffLayout() {
 
   return (
     <div className="admin-layout">
-      <aside className="admin-sidebar" style={{ backgroundColor: '#213555' }}>
+      <aside className="admin-sidebar">
         <div className="admin-logo-area">
-          <div className="admin-logo-icon">S</div>
-          Staff Hub
+          <div className="admin-logo-icon">M</div>
+          Metricon
         </div>
         
         <nav className="admin-nav-menu">
@@ -65,27 +65,46 @@ export default function StaffLayout() {
 
       <div className="admin-main-container">
         <header className="admin-header">
-          <h2 className="admin-header-title">Welcome, Staff Member</h2>
+          <h2 className="admin-header-title">Staff Hub</h2>
           
           <div className="admin-header-user">
-            <span>{user?.name || "Staff"}</span>
-            <div className="admin-avatar" style={{ backgroundColor: '#4F709C' }}>
-              {(user?.name || "S").charAt(0).toUpperCase()}
-            </div>
+            <Link to="/staff/profile" className="admin-header-user-clickable" title="View Profile">
+              <div className="user-name-wrapper">
+                <span className="user-name-text">{user?.name || "Staff Member"}</span>
+                <span className="user-role-text">{user?.role || "Staff"}</span>
+              </div>
+              <div className="admin-avatar">
+                {(user?.name || "S").charAt(0).toUpperCase()}
+              </div>
+            </Link>
+
             <button 
               onClick={handleLogout} 
-              className="btn-primary"
-              style={{ padding: "6px 12px", display: "flex", gap: "6px", alignItems: "center", backgroundColor: '#e74c3c' }}
+              className="btn-danger logout-btn"
+              style={{ padding: "8px 16px", display: "flex", gap: "6px", alignItems: "center" }}
             >
-              <span style={{width: '16px', height: '16px'}}><Icons.Logout /></span>
+              <Icons.Logout />
               Logout
             </button>
           </div>
         </header>
 
-        <main className="admin-content">
-          <Outlet />
-        </main>
+        <div className="admin-scroll-area">
+          <main className="admin-content">
+            <Outlet />
+          </main>
+
+          <footer className="admin-footer">
+            <div className="admin-footer-copy">
+              &copy; {new Date().getFullYear()} Metricon Campus Management System. All rights reserved.
+            </div>
+            <div className="admin-footer-links">
+              <Link to="/staff" className="admin-footer-link">Dashboard</Link>
+              <Link to="/staff/profile" className="admin-footer-link">Profile</Link>
+              <span className="admin-footer-link">v1.2.4-stable</span>
+            </div>
+          </footer>
+        </div>
       </div>
     </div>
   );
