@@ -6,6 +6,13 @@ import './App.css'
 function App() {
   const [count, setCount] = useState(0)
 
+<<<<<<< Updated upstream
+=======
+  if (loading) {
+    return <h2>Loading...</h2>;
+  }
+
+>>>>>>> Stashed changes
   return (
     <>
       <div>
