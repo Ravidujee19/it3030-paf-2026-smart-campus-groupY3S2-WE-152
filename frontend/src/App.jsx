@@ -1,4 +1,3 @@
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import ResourceListPage from "./pages/resources/ResourceListPage";
 

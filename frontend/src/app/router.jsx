@@ -106,7 +106,8 @@ const router = createBrowserRouter([
       { path: "facilities", element: <ResourceListPage /> },
       { path: "bookings", element: <MyBookingsPage /> },
       { path: "verify", element: <VerificationPage /> },
-      { path: "profile", element: <ProfilePage /> }
+      { path: "profile", element: <ProfilePage /> },
+      { path: "notifications", element: <NotificationsPage /> }
     ]
   },
   {

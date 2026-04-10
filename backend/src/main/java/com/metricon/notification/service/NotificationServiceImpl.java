@@ -11,6 +11,7 @@ import com.metricon.notification.entity.Notification;
 import com.metricon.notification.repository.NotificationRepository;
 import com.metricon.user.entity.User;
 import com.metricon.user.repository.UserRepository;
+import com.metricon.common.enums.RoleName;
 
 @Service
 public class NotificationServiceImpl implements NotificationService {
@@ -70,6 +71,16 @@ public class NotificationServiceImpl implements NotificationService {
                     dto
             );
         });
+    }
+
+    @Override
+    public void notifyRoles(List<RoleName> roles, String title, String message, NotificationType type) {
+        for (RoleName roleName : roles) {
+            List<User> targetUsers = userRepository.findByRoleName(roleName);
+            for (User user : targetUsers) {
+                createNotification(user.getEmail(), title, message, type);
+            }
+        }
     }
 
     private User getUserByEmail(String email) {

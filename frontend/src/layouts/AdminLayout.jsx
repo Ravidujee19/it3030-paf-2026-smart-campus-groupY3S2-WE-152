@@ -1,5 +1,6 @@
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useNotifications } from "../context/NotificationContext";
 import AvatarCard from "../components/common/AvatarCard";
 import "../styles/adminLayout.css";
 const Icons = {
@@ -31,6 +32,7 @@ const Icons = {
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
+  const { unreadCount } = useNotifications();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -82,7 +84,7 @@ export default function AdminLayout() {
             {/* Notification Bell */}
             <Link to="/admin/notifications" className="admin-bell-btn" title="View Notifications">
               <Icons.Notifications />
-              <span className="admin-bell-badge">3</span> {/* Hardcoded for now, or could fetch */}
+              {unreadCount > 0 && <span className="admin-bell-badge">{unreadCount}</span>}
             </Link>
 
             <Link to="/admin/profile" className="admin-header-user-clickable" title="View Profile">

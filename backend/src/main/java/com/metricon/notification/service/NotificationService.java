@@ -10,4 +10,5 @@ public interface NotificationService {
     void markAsRead(Long notificationId, String email);
     void markAllAsRead(String email);
     void createNotification(String userEmail, String title, String message, NotificationType type);
+    void notifyRoles(List<com.metricon.common.enums.RoleName> roles, String title, String message, NotificationType type);
 }
