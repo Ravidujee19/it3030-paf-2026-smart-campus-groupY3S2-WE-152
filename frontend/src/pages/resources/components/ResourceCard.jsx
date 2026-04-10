@@ -4,6 +4,19 @@ import BookingRequestModal from '../../bookings/components/BookingRequestModal';
 import ResourceDetailModal from './ResourceDetailModal';
 import './ResourceCard.css';
 
+// Import category-specific images
+import lectureHallImg from '../../../assets/resources/lecture-hall.png';
+import labImg from '../../../assets/resources/lab.png';
+import meetingRoomImg from '../../../assets/resources/meeting-room.png';
+import equipmentImg from '../../../assets/resources/equipment.png';
+
+const TYPE_IMAGE_MAP = {
+  'LECTURE_HALL': lectureHallImg,
+  'LAB': labImg,
+  'MEETING_ROOM': meetingRoomImg,
+  'EQUIPMENT': equipmentImg
+};
+
 const ResourceCard = ({ resource, onDelete, onEdit, onBook, onViewDetails }) => {
   const { id, name, type, capacity, location, status } = resource;
   const { user } = useAuth();
@@ -39,11 +52,24 @@ const ResourceCard = ({ resource, onDelete, onEdit, onBook, onViewDetails }) => 
 
   return (
     <div className="resource-card">
+      <div className="resource-card-image-container">
+        <img 
+          src={TYPE_IMAGE_MAP[type] || lectureHallImg} 
+          alt={name} 
+          className="resource-card-image"
+        />
+        <div className="image-overlay">
+          <span className={`status-badge-compact ${getStatusClass(status)}`}>
+            {status}
+          </span>
+        </div>
+      </div>
+      
       <div className="resource-card-header">
         <div className="header-left">
           <span className="resource-icon">{getTypeIcon(type)}</span>
-          <span className={`status-badge ${getStatusClass(status)}`}>
-            {status}
+          <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--admin-text-light)' }}>
+            {type.replace('_', ' ')}
           </span>
         </div>
         {isAdmin && (
