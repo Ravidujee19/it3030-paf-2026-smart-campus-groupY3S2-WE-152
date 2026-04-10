@@ -85,18 +85,20 @@ export default function AdminLayout() {
               <span className="admin-bell-badge">3</span> {/* Hardcoded for now, or could fetch */}
             </Link>
 
-            <div className="user-name-wrapper">
-              <span className="user-name-text">{user?.name || "Admin"}</span>
-              <span className="user-role-text">Administrator</span>
-            </div>
-            
-            <div className="admin-avatar">
-              {(user?.name || "A").charAt(0).toUpperCase()}
-            </div>
+            <Link to="/admin/profile" className="admin-header-user-clickable" title="View Profile">
+              <div className="user-name-wrapper">
+                <span className="user-name-text">{user?.name || "Admin"}</span>
+                <span className="user-role-text">Administrator</span>
+              </div>
+              
+              <div className="admin-avatar">
+                {(user?.name || "A").charAt(0).toUpperCase()}
+              </div>
+            </Link>
             
             <button 
               onClick={handleLogout} 
-              className="btn-danger"
+              className="btn-danger logout-btn"
               style={{ padding: "8px 16px", display: "flex", gap: "6px", alignItems: "center" }}
             >
               <Icons.Logout />

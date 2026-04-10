@@ -70,6 +70,7 @@ const router = createBrowserRouter([
       { path: "verify", element: <VerificationPage /> },
       { path: "maintenance", element: <MaintenanceTicketingPage /> },
       { path: "notifications", element: <NotificationsPage /> },
+      { path: "profile", element: <ProfilePage /> }
     ]
   },
   {
@@ -100,6 +101,7 @@ const router = createBrowserRouter([
       { path: "facilities", element: <ResourceListPage /> },
       { path: "bookings", element: <MyBookingsPage /> },
       { path: "verify", element: <VerificationPage /> },
+      { path: "profile", element: <ProfilePage /> }
     ]
   },
   {
