@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import MotivationalQuotes from '../../components/staff/MotivationalQuotes';
 import './StaffDashboard.css';
 
 const StaffPage = () => {
@@ -52,6 +53,8 @@ const StaffPage = () => {
           </div>
         </div>
       </header>
+
+      <MotivationalQuotes />
 
       <div className="dashboard-sections">
         <section className="section-card quick-actions">
