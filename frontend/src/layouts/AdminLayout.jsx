@@ -53,8 +53,8 @@ export default function AdminLayout() {
     <div className="admin-layout">
       <aside className="admin-sidebar">
         <div className="admin-logo-area">
-          <div className="admin-logo-icon">S</div>
-          Smart Campus
+          <div className="admin-logo-icon">M</div>
+          Metricon
         </div>
         
         <nav className="admin-nav-menu">
@@ -112,7 +112,7 @@ export default function AdminLayout() {
 
           <footer className="admin-footer">
             <div className="admin-footer-copy">
-              &copy; {new Date().getFullYear()} Smart Campus Management System. All rights reserved.
+              &copy; {new Date().getFullYear()} Metricon Campus Management System. All rights reserved.
             </div>
             <div className="admin-footer-links">
               <Link to="/admin" className="admin-footer-link">Dashboard</Link>
