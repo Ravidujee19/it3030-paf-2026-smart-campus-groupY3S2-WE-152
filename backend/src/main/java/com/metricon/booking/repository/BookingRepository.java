@@ -25,4 +25,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("SELECT b FROM Booking b WHERE (:status IS NULL OR b.status = :status)")
     List<Booking> findAllWithFilters(@Param("status") Booking.BookingStatus status);
+
+    boolean existsByResourceId(Long resourceId);
 }

@@ -6,6 +6,7 @@ import com.metricon.notification.service.NotificationService;
 import com.metricon.resource.dto.ResourceDto;
 import com.metricon.resource.entity.Resource;
 import com.metricon.resource.repository.ResourceRepository;
+import com.metricon.booking.repository.BookingRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,10 +17,12 @@ public class ResourceService {
 
     private final ResourceRepository resourceRepository;
     private final NotificationService notificationService;
+    private final BookingRepository bookingRepository;
 
-    public ResourceService(ResourceRepository resourceRepository, NotificationService notificationService) {
+    public ResourceService(ResourceRepository resourceRepository, NotificationService notificationService, BookingRepository bookingRepository) {
         this.resourceRepository = resourceRepository;
         this.notificationService = notificationService;
+        this.bookingRepository = bookingRepository;
     }
 
     public List<ResourceDto> getAllResources() {
@@ -82,6 +85,9 @@ public class ResourceService {
     }
 
     public void deleteResource(Long id) {
+        if (bookingRepository.existsByResourceId(id)) {
+            throw new IllegalArgumentException("Cannot delete resource because it has existing bookings. Please update the status to 'Out of Service' instead.");
+        }
         resourceRepository.deleteById(id);
     }
 

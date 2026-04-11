@@ -44,7 +44,10 @@ const ResourceListPage = ({ refreshTrigger, hideHeader = false }) => {
       await resourceService.deleteResource(id);
       setResources((prev) => prev.filter((r) => r.id !== id));
     } catch (err) {
-      alert('Failed to delete resource. Please try again.');
+      const errorMessage = err.response && err.response.data && err.response.data.message 
+        ? err.response.data.message 
+        : 'Failed to delete resource. Please try again or check if it has existing bookings.';
+      alert(errorMessage);
     }
   };
 
