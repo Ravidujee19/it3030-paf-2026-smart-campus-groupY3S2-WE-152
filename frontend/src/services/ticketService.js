@@ -1,130 +1,237 @@
-import axios from "axios";
+import axios from 'axios';
 
-const API = axios.create({
-  baseURL: "http://localhost:8081",
+/**
+ * Backend Base URL.
+ * Port 8081 as per Spring Boot configuration.
+ */
+const API_BASE_URL = 'http://localhost:8081/api';
+
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
   withCredentials: true,
 });
 
-// ──────────────────────────────────────────────
-// TICKET ENDPOINTS
-// ──────────────────────────────────────────────
+/**
+ * AXIOS INTERCEPTOR:
+ * Automatically injects the JWT token from localStorage into the Authorization header.
+ */
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 /**
- * GET /api/tickets — Fetch all tickets, optionally filtered by status.
+ * BULLETPROOF ENUM MAPPING:
  */
-export const getAllTickets = async (status = null) => {
-  const params = status ? { status } : {};
-  const response = await API.get("/api/tickets", { params });
-  return response.data;
-};
-
-/**
- * GET /api/tickets/:id — Fetch a single ticket by ID.
- */
-export const getTicketById = async (id) => {
-  const response = await API.get(`/api/tickets/${id}`);
-  return response.data;
-};
-
-/**
- * GET /api/tickets/user/:userId — Fetch tickets created by a specific user.
- */
-export const getTicketsByUser = async (userId) => {
-  const response = await API.get(`/api/tickets/user/${userId}`);
-  return response.data;
+const mapToEnum = (value) => {
+  if (!value) return '';
+  return value.toString().toUpperCase().trim().replace(/[^A-Z0-9]+/g, '_');
 };
 
 /**
- * GET /api/tickets/assigned/:technicianId — Fetch tickets assigned to a technician.
+ * Ticket Service class - Aligned with existing Java Controllers.
  */
-export const getTicketsByAssignee = async (technicianId) => {
-  const response = await API.get(`/api/tickets/assigned/${technicianId}`);
-  return response.data;
-};
+class TicketService {
+  /**
+   * Universal error handler with browser alerts for exact failure visibility.
+   */
+  handleError(error, context) {
+    const backendData = error.response?.data;
+    const detailedMessage = typeof backendData === 'object' ? (backendData.message || JSON.stringify(backendData)) : backendData;
+    const finalMessage = detailedMessage || error.message || `Failed to ${context}.`;
 
-/**
- * POST /api/tickets — Create a new ticket.
- */
-export const createTicket = async (ticketData) => {
-  const response = await API.post("/api/tickets", ticketData);
-  return response.data;
-};
+    console.error(`Error during ${context}:`, error);
+    alert(`CRITICAL ERROR: ${context.toUpperCase()} failed.\nBackend message: ${finalMessage}`);
+    throw new Error(finalMessage);
+  }
 
-/**
- * PATCH /api/tickets/:id/status — Update a ticket's workflow status.
- */
-export const updateTicketStatus = async (id, status) => {
-  const response = await API.patch(`/api/tickets/${id}/status`, { status });
-  return response.data;
-};
+  // ──────────────────────────────────────────────
+  // TICKET ACTIONS
+  // ──────────────────────────────────────────────
 
-/**
- * PATCH /api/tickets/:id/assign — Assign a technician to a ticket.
- */
-export const assignTechnician = async (id, technicianId) => {
-  const response = await API.patch(`/api/tickets/${id}/assign`, null, {
-    params: { technicianId },
-  });
-  return response.data;
-};
+  async getAllTickets() {
+    try {
+      const response = await apiClient.get('/tickets');
+      return response.data;
+    } catch (error) { this.handleError(error, 'fetching all tickets'); }
+  }
 
-/**
- * DELETE /api/tickets/:id — Delete a ticket.
- */
-export const deleteTicket = async (id) => {
-  const response = await API.delete(`/api/tickets/${id}`);
-  return response.data;
-};
+  async getTicketById(id) {
+    try {
+      const response = await apiClient.get(`/tickets/${id}`);
+      return response.data;
+    } catch (error) { this.handleError(error, `fetching ticket #${id}`); }
+  }
 
-// ──────────────────────────────────────────────
-// COMMENT ENDPOINTS
-// ──────────────────────────────────────────────
+  /**
+   * TWO-STEP CREATION PROCESS:
+   * Step 1: Create ticket text details via standard application/json.
+   * Step 2: Upload images if any.
+   */
+  async createTicket(ticketData, images = []) {
+    try {
+      // Step 1: Create text record (JSON)
+      const jsonPayload = {
+        ...ticketData,
+        priority: mapToEnum(ticketData.priority),
+        category: mapToEnum(ticketData.category)
+      };
 
-/**
- * GET /api/tickets/:ticketId/comments — Fetch all comments for a ticket.
- */
-export const getCommentsByTicket = async (ticketId) => {
-  const response = await API.get(`/api/tickets/${ticketId}/comments`);
-  return response.data;
-};
+      const response = await apiClient.post('/tickets', jsonPayload);
+      const newTicket = response.data;
+      const ticketId = newTicket.id;
 
-/**
- * POST /api/tickets/:ticketId/comments — Add a comment to a ticket.
- */
-export const addComment = async (ticketId, commentData) => {
-  const response = await API.post(`/api/tickets/${ticketId}/comments`, commentData);
-  return response.data;
-};
+      // Step 2: Upload Images (Multipart)
+      if (images && images.length > 0) {
+        const formData = new FormData();
+        images.slice(0, 3).forEach((image) => {
+          formData.append('attachments', image);
+        });
 
-/**
- * PUT /api/tickets/comments/:commentId — Edit a comment (ownership enforced).
- */
-export const editComment = async (commentId, commentData) => {
-  const response = await API.put(`/api/tickets/comments/${commentId}`, commentData);
-  return response.data;
-};
+        // Use userId from ticketData to identify uploader
+        await axios.post(`${API_BASE_URL}/tickets/${ticketId}/attachments`, formData, {
+          params: { userId: ticketData.createdByUserId },
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+      }
 
-/**
- * DELETE /api/tickets/comments/:commentId?userId=:userId — Delete a comment (ownership enforced).
- */
-export const deleteComment = async (commentId, userId) => {
-  const response = await API.delete(`/api/tickets/comments/${commentId}`, {
-    params: { userId },
-  });
-  return response.data;
-};
+      return newTicket;
+    } catch (error) {
+      this.handleError(error, 'creating ticket (two-step)');
+    }
+  }
 
-export default {
-  getAllTickets,
-  getTicketById,
-  getTicketsByUser,
-  getTicketsByAssignee,
-  createTicket,
-  updateTicketStatus,
-  assignTechnician,
-  deleteTicket,
-  getCommentsByTicket,
-  addComment,
-  editComment,
-  deleteComment,
-};
+
+  async updateTicketStatus(id, status) {
+    try {
+      const response = await apiClient.patch(`/tickets/${id}/status`, { status: mapToEnum(status) });
+      return response.data;
+    } catch (error) { this.handleError(error, 'updating status'); }
+  }
+
+  async updateTicketPriority(id, priority) {
+    try {
+      const response = await apiClient.patch(`/tickets/${id}/priority`, null, {
+        params: { priority: mapToEnum(priority) }
+      });
+      return response.data;
+    } catch (error) { this.handleError(error, 'updating priority'); }
+  }
+
+  async updateTicket(id, ticketData) {
+    try {
+      const payload = {
+        title: ticketData.title,
+        description: ticketData.description,
+        category: ticketData.category ? mapToEnum(ticketData.category) : undefined,
+        priority: ticketData.priority ? mapToEnum(ticketData.priority) : undefined,
+        location: ticketData.location,
+        resourceName: ticketData.resourceName,
+        contactEmail: ticketData.contactEmail,
+        contactPhone: ticketData.contactPhone
+      };
+      const response = await apiClient.patch(`/tickets/${id}`, payload);
+      return response.data;
+    } catch (error) { this.handleError(error, 'updating ticket'); }
+  }
+
+  // ──────────────────────────────────────────────
+  // FILTERING ACTIONS
+  // ──────────────────────────────────────────────
+
+  async getTicketsByUser(userId) {
+    try {
+      const response = await apiClient.get(`/tickets/user/${userId}`);
+      return response.data;
+    } catch (error) { this.handleError(error, 'fetching user tickets'); }
+  }
+
+  async getTicketsByAssignee(technicianId) {
+    try {
+      const response = await apiClient.get(`/tickets/assigned/${technicianId}`);
+      return response.data;
+    } catch (error) { this.handleError(error, 'fetching assigned tickets'); }
+  }
+
+  // ──────────────────────────────────────────────
+  // COMMENTS
+  // ──────────────────────────────────────────────
+
+  async getCommentsByTicket(ticketId) {
+    try {
+      const response = await apiClient.get(`/tickets/${ticketId}/comments`);
+      return response.data;
+    } catch (error) { this.handleError(error, 'fetching comments'); }
+  }
+
+  async addComment(ticketId, commentData) {
+    try {
+      const payload = { userId: commentData.userId, content: commentData.content };
+      const response = await apiClient.post(`/tickets/${ticketId}/comments`, payload);
+      return response.data;
+    } catch (error) { this.handleError(error, 'adding comment'); }
+  }
+
+  async editComment(commentId, commentData) {
+    try {
+      const payload = { userId: commentData.userId, content: commentData.content };
+      const response = await apiClient.put(`/tickets/comments/${commentId}`, payload);
+      return response.data;
+    } catch (error) { this.handleError(error, 'editing comment'); }
+  }
+
+  async deleteComment(commentId, userId) {
+    try {
+      await apiClient.delete(`/tickets/comments/${commentId}`, { params: { userId } });
+    } catch (error) { this.handleError(error, 'deleting comment'); }
+  }
+
+  // ──────────────────────────────────────────────
+  // OTHER CONTROLS
+  // ──────────────────────────────────────────────
+
+  async assignTechnician(id, technicianId) {
+    try {
+      const response = await apiClient.patch(`/tickets/${id}/assign`, null, { params: { technicianId } });
+      return response.data;
+    } catch (error) { this.handleError(error, 'assigning technician'); }
+  }
+
+  async deleteTicket(id) {
+    try {
+      await apiClient.delete(`/tickets/${id}`);
+    } catch (error) { this.handleError(error, 'deleting ticket'); }
+  }
+}
+
+const ticketService = new TicketService();
+export default ticketService;
+
+// Named exports for backward compatibility
+export const getAllTickets = ticketService.getAllTickets.bind(ticketService);
+export const getTicketById = ticketService.getTicketById.bind(ticketService);
+export const createTicket = ticketService.createTicket.bind(ticketService);
+export const updateTicketStatus = ticketService.updateTicketStatus.bind(ticketService);
+export const updateTicketPriority = ticketService.updateTicketPriority.bind(ticketService);
+export const getCommentsByTicket = ticketService.getCommentsByTicket.bind(ticketService);
+export const addComment = ticketService.addComment.bind(ticketService);
+export const editComment = ticketService.editComment.bind(ticketService);
+export const deleteComment = ticketService.deleteComment.bind(ticketService);
+export const assignTechnician = ticketService.assignTechnician.bind(ticketService);
+export const deleteTicket = ticketService.deleteTicket.bind(ticketService);
+export const getTicketsByUser = ticketService.getTicketsByUser.bind(ticketService);
+export const getTicketsByAssignee = ticketService.getTicketsByAssignee.bind(ticketService);

@@ -68,18 +68,18 @@ public class TicketService {
     // ──────────────────────────────────────────────
 
     /**
-     * Retrieves a ticket by its ID.
+     * Retrieves a ticket by its ID with eager loaded attachments.
      */
     public Ticket getTicketById(Long id) {
-        return ticketRepository.findById(id)
+        return ticketRepository.findByIdWithAttachments(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket", id));
     }
 
     /**
-     * Retrieves all tickets.
+     * Retrieves all tickets with eager loaded attachments.
      */
     public List<Ticket> getAllTickets() {
-        return ticketRepository.findAll();
+        return ticketRepository.findAllWithAttachments();
     }
 
     /**
@@ -97,10 +97,10 @@ public class TicketService {
     }
 
     /**
-     * Retrieves all tickets with a given status.
+     * Retrieves all tickets with a given status, with eager loaded attachments.
      */
     public List<Ticket> getTicketsByStatus(TicketStatus status) {
-        return ticketRepository.findByStatus(status);
+        return ticketRepository.findByStatusWithAttachments(status);
     }
 
     // ──────────────────────────────────────────────
@@ -234,4 +234,5 @@ public class TicketService {
         Set<TicketStatus> allowed = ALLOWED_TRANSITIONS.get(currentStatus);
         return allowed != null && allowed.contains(newStatus);
     }
+
 }

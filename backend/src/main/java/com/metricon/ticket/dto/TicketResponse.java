@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * DTO for returning ticket data in API responses.
@@ -43,4 +44,7 @@ public class TicketResponse {
 
     private int commentCount;
     private int attachmentCount;
+    
+    // Detailed attachments list for frontend display
+    private List<AttachmentResponse> attachments;
 }

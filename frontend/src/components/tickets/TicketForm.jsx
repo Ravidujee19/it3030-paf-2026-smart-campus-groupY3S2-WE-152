@@ -1,281 +1,196 @@
-import React, { useState } from 'react';
-import { createTicket } from '../../services/ticketService';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import ticketService from '../../services/ticketService';
 import './TicketForm.css';
 
-const CATEGORIES = [
-  { value: 'ELECTRICAL', label: 'Electrical' },
-  { value: 'PLUMBING', label: 'Plumbing' },
-  { value: 'HVAC', label: 'HVAC / Air Conditioning' },
-  { value: 'NETWORK', label: 'Network / Internet' },
-  { value: 'FURNITURE', label: 'Furniture' },
-  { value: 'CLEANING', label: 'Cleaning' },
-  { value: 'SECURITY', label: 'Security' },
-  { value: 'OTHER', label: 'Other' },
-];
-
-const PRIORITIES = [
-  { value: 'LOW', label: 'Low', color: '#10b981' },
-  { value: 'MEDIUM', label: 'Medium', color: '#f59e0b' },
-  { value: 'HIGH', label: 'High', color: '#f97316' },
-  { value: 'CRITICAL', label: 'Critical', color: '#ef4444' },
-];
-
-const MAX_ATTACHMENTS = 3;
-
-const TicketForm = ({ onSuccess, onCancel }) => {
+/**
+ * TicketForm component with RELATIVE ROUTING.
+ */
+const TicketForm = () => {
+  const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
+  const fileInputRef = useRef(null);
+  
   const [formData, setFormData] = useState({
     title: '',
-    description: '',
     category: '',
     priority: '',
     location: '',
     resourceName: '',
+    description: '',
     contactEmail: '',
     contactPhone: '',
-    createdByUserId: 1, // TODO: Replace with logged-in user ID from auth context
   });
 
-  const [attachments, setAttachments] = useState([]);
+  const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
 
-  const handleChange = (e) => {
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        contactEmail: user.email || '',
+        contactPhone: user.phone || ''
+      }));
+    }
+  }, [user]);
+
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-
-    if (attachments.length + files.length > MAX_ATTACHMENTS) {
-      setError(`You can upload a maximum of ${MAX_ATTACHMENTS} images.`);
+    
+    if (images.length + files.length > 3) {
+      setError('You can only attach a maximum of 3 images.');
       return;
     }
 
-    // Validate file types (images only)
-    const invalidFiles = files.filter((f) => !f.type.startsWith('image/'));
-    if (invalidFiles.length > 0) {
-      setError('Only image files are allowed.');
-      return;
-    }
-
+    const newImages = [...images, ...files].slice(0, 3);
+    setImages(newImages);
     setError(null);
-    setAttachments((prev) => [...prev, ...files]);
   };
 
-  const removeAttachment = (index) => {
-    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  const removeImage = (index) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!user) {
+      setError('You must be logged in.');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      await createTicket(formData);
-      setSuccess(true);
-      setFormData({
-        title: '',
-        description: '',
-        category: '',
-        priority: '',
-        location: '',
-        resourceName: '',
-        contactEmail: '',
-        contactPhone: '',
-        createdByUserId: 1,
-      });
-      setAttachments([]);
-
-      if (onSuccess) {
-        setTimeout(() => onSuccess(), 1500);
-      }
+      const finalData = { ...formData, createdByUserId: user.id };
+      await ticketService.createTicket(finalData, images);
+      
+      // RELATIVE NAVIGATION ON SUCCESS
+      navigate('..', { relative: 'path' }); 
     } catch (err) {
-      setError(
-        err.response?.data?.message || 'Failed to create ticket. Please try again.'
-      );
+      setError('Failed to submit. Please try again.');
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  if (success) {
-    return (
-      <div className="ticket-form-container">
-        <div className="success-card">
-          <div className="success-icon">✓</div>
-          <h2>Ticket Submitted!</h2>
-          <p>Your maintenance request has been created successfully.</p>
-        </div>
-      </div>
-    );
+  if (authLoading) {
+    return <div style={{ textAlign: 'center', padding: '100px 0' }}><div className="spinner"></div></div>;
   }
 
   return (
-    <div className="ticket-form-container">
-      <div className="ticket-form-card">
-        <div className="form-header">
-          <h2>Report an Incident</h2>
-          <p>Fill in the details below to submit a maintenance or incident ticket.</p>
-        </div>
+    <div className="ticket-form-page" style={{ animation: 'fadeIn 0.4s ease-out' }}>
+      <div className="form-header">
+        <h2 style={{ color: '#1e293b' }}>Report Maintenance Issue</h2>
+        <p style={{ color: '#64748b' }}>Fill in the details below</p>
+      </div>
 
-        {error && (
-          <div className="form-error">
-            <span className="error-icon">⚠</span>
-            {error}
-          </div>
-        )}
+      <div className="ticket-form-card" style={{ background: '#fff' }}>
+        {error && <div className="error-msg">{error}</div>}
 
-        <form onSubmit={handleSubmit} className="ticket-form">
-          {/* Title */}
-          <div className="form-group full-width">
-            <label htmlFor="title">Title *</label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              placeholder="Brief summary of the issue"
-              value={formData.title}
-              onChange={handleChange}
-              required
-            />
-          </div>
+        <form onSubmit={handleSubmit}>
+          <div className="form-grid">
+            <div className="form-group full-width">
+              <label>Ticket Summary</label>
+              <input 
+                type="text" 
+                name="title" 
+                placeholder="What needs fixing?"
+                value={formData.title}
+                onChange={handleInputChange}
+                required
+                style={{ color: '#1e293b' }}
+              />
+            </div>
 
-          {/* Category & Priority — side by side */}
-          <div className="form-group">
-            <label htmlFor="category">Category *</label>
-            <select
-              id="category"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              required
-            >
-              <option value="" disabled>Select a category</option>
-              {CATEGORIES.map((cat) => (
-                <option key={cat.value} value={cat.value}>
-                  {cat.label}
-                </option>
-              ))}
-            </select>
-          </div>
+            <div className="form-group">
+              <label>Category</label>
+              <select name="category" value={formData.category} onChange={handleInputChange} required style={{ color: '#1e293b' }}>
+                <option value="">Select Category</option>
+                <option value="ELECTRICAL">Electrical</option>
+                <option value="PLUMBING">Plumbing</option>
+                <option value="HVAC">HVAC / AC</option>
+                <option value="NETWORK">Network / Wifi</option>
+                <option value="FURNITURE">Furniture</option>
+                <option value="OTHER">Other</option>
+              </select>
+            </div>
 
-          <div className="form-group">
-            <label htmlFor="priority">Priority *</label>
-            <select
-              id="priority"
-              name="priority"
-              value={formData.priority}
-              onChange={handleChange}
-              required
-            >
-              <option value="" disabled>Select priority</option>
-              {PRIORITIES.map((p) => (
-                <option key={p.value} value={p.value}>
-                  {p.label}
-                </option>
-              ))}
-            </select>
-          </div>
+            <div className="form-group">
+              <label>Priority</label>
+              <select name="priority" value={formData.priority} onChange={handleInputChange} required style={{ color: '#1e293b' }}>
+                <option value="">Select Priority</option>
+                <option value="LOW">Low</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HIGH">High</option>
+                <option value="CRITICAL">Critical</option>
+              </select>
+            </div>
 
-          {/* Location & Resource Name */}
-          <div className="form-group">
-            <label htmlFor="location">Location *</label>
-            <input
-              type="text"
-              id="location"
-              name="location"
-              placeholder="e.g., Building A, Lab 3"
-              value={formData.location}
-              onChange={handleChange}
-              required
-            />
-          </div>
+            <div className="form-group">
+              <label>Location</label>
+              <input 
+                type="text" 
+                name="location" 
+                placeholder="e.g. Block A, Lab 2"
+                value={formData.location}
+                onChange={handleInputChange}
+                required
+                style={{ color: '#1e293b' }}
+              />
+            </div>
 
-          <div className="form-group">
-            <label htmlFor="resourceName">Resource / Asset Name</label>
-            <input
-              type="text"
-              id="resourceName"
-              name="resourceName"
-              placeholder="e.g., AC Unit #12"
-              value={formData.resourceName}
-              onChange={handleChange}
-            />
-          </div>
+            <div className="form-group">
+              <label>Asset Name</label>
+              <input 
+                type="text" 
+                name="resourceName" 
+                placeholder="Optional"
+                value={formData.resourceName}
+                onChange={handleInputChange}
+                style={{ color: '#1e293b' }}
+              />
+            </div>
 
-          {/* Description — full width */}
-          <div className="form-group full-width">
-            <label htmlFor="description">Description *</label>
-            <textarea
-              id="description"
-              name="description"
-              rows="4"
-              placeholder="Provide a detailed description of the issue..."
-              value={formData.description}
-              onChange={handleChange}
-              required
-            />
-          </div>
+            <div className="form-group full-width">
+              <label>Detailed Description</label>
+              <textarea 
+                name="description" 
+                placeholder="Please explain the issue..."
+                value={formData.description}
+                onChange={handleInputChange}
+                required
+                style={{ color: '#1e293b' }}
+              />
+            </div>
 
-          {/* Contact Info */}
-          <div className="form-group">
-            <label htmlFor="contactEmail">Contact Email</label>
-            <input
-              type="email"
-              id="contactEmail"
-              name="contactEmail"
-              placeholder="your@email.com"
-              value={formData.contactEmail}
-              onChange={handleChange}
-            />
-          </div>
+            <div className="form-group full-width">
+              <label>Photos (Max 3)</label>
+              <div 
+                className="file-upload-section"
+                onClick={() => fileInputRef.current.click()}
+                style={{ border: '2px dashed #e2e8f0', background: '#f8fafc' }}
+              >
+                <span className="upload-icon">📸</span>
+                <p style={{ color: '#64748b' }}>Click to upload</p>
+                <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" multiple style={{ display: 'none' }} />
+              </div>
 
-          <div className="form-group">
-            <label htmlFor="contactPhone">Contact Phone</label>
-            <input
-              type="tel"
-              id="contactPhone"
-              name="contactPhone"
-              placeholder="077-123-4567"
-              value={formData.contactPhone}
-              onChange={handleChange}
-            />
-          </div>
-
-          {/* File Attachments */}
-          <div className="form-group full-width">
-            <label>Attachments (max {MAX_ATTACHMENTS} images)</label>
-            <div className="attachment-area">
-              {attachments.length < MAX_ATTACHMENTS && (
-                <label className="file-upload-btn" htmlFor="file-input">
-                  <span className="upload-icon">📎</span>
-                  <span>Choose Images</span>
-                  <input
-                    type="file"
-                    id="file-input"
-                    accept="image/*"
-                    multiple
-                    onChange={handleFileChange}
-                    style={{ display: 'none' }}
-                  />
-                </label>
-              )}
-
-              {attachments.length > 0 && (
-                <div className="attachment-list">
-                  {attachments.map((file, index) => (
-                    <div key={index} className="attachment-chip">
-                      <span className="chip-name">{file.name}</span>
-                      <button
-                        type="button"
-                        className="chip-remove"
-                        onClick={() => removeAttachment(index)}
-                      >
-                        ✕
-                      </button>
+              {images.length > 0 && (
+                <div className="preview-grid">
+                  {images.map((file, index) => (
+                    <div key={index} className="preview-item">
+                      <img src={URL.createObjectURL(file)} alt="preview" />
+                      <button type="button" className="remove-file" onClick={() => removeImage(index)}>✕</button>
                     </div>
                   ))}
                 </div>
@@ -283,22 +198,18 @@ const TicketForm = ({ onSuccess, onCancel }) => {
             </div>
           </div>
 
-          {/* Form Actions */}
-          <div className="form-actions full-width">
-            {onCancel && (
-              <button type="button" className="btn-cancel" onClick={onCancel}>
-                Cancel
-              </button>
-            )}
+          <div className="form-actions" style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.5rem' }}>
+            <button 
+              type="button" 
+              className="btn-cancel"
+              onClick={() => navigate('..', { relative: 'path' })} // RELATIVE CANCEL NAVIGATION
+              disabled={loading}
+              style={{ border: '1px solid #cbd5e1', color: '#64748b' }}
+            >
+              Cancel
+            </button>
             <button type="submit" className="btn-submit" disabled={loading}>
-              {loading ? (
-                <>
-                  <span className="btn-spinner"></span>
-                  Submitting...
-                </>
-              ) : (
-                'Submit Ticket'
-              )}
+              {loading ? 'Submitting...' : 'Submit Ticket'}
             </button>
           </div>
         </form>
