@@ -234,4 +234,5 @@ public class TicketService {
         Set<TicketStatus> allowed = ALLOWED_TRANSITIONS.get(currentStatus);
         return allowed != null && allowed.contains(newStatus);
     }
+
 }

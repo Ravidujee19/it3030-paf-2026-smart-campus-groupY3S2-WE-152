@@ -22,6 +22,11 @@ import MyBookingsPage from "../pages/bookings/MyBookingsPage";
 import VerificationPage from "../pages/admin/VerificationPage";
 import StudentDashboard from "../pages/common/StudentDashboard";
 
+// Import Ticketing Components for Nested Routes
+import TicketList from "../components/tickets/TicketList";
+import TicketForm from "../components/tickets/TicketForm";
+import TicketDetail from "../components/tickets/TicketDetail";
+
 const router = createBrowserRouter([
   {
     path: "/login",
@@ -68,7 +73,15 @@ const router = createBrowserRouter([
       { path: "facilities", element: <FacilitiesAssetsPage /> },
       { path: "bookings", element: <BookingManagementPage /> },
       { path: "verify", element: <VerificationPage /> },
-      { path: "maintenance", element: <MaintenanceTicketingPage /> },
+      { 
+        path: "maintenance", 
+        element: <MaintenanceTicketingPage />,
+        children: [
+          { index: true, element: <TicketList /> },
+          { path: "new", element: <TicketForm /> },
+          { path: ":id", element: <TicketDetail /> }
+        ]
+      },
       { path: "notifications", element: <NotificationsPage /> },
       { path: "profile", element: <ProfilePage /> }
     ]
@@ -101,6 +114,15 @@ const router = createBrowserRouter([
       { path: "facilities", element: <ResourceListPage /> },
       { path: "bookings", element: <MyBookingsPage /> },
       { path: "verify", element: <VerificationPage /> },
+      { 
+        path: "maintenance", 
+        element: <MaintenanceTicketingPage />,
+        children: [
+          { index: true, element: <TicketList /> },
+          { path: "new", element: <TicketForm /> },
+          { path: ":id", element: <TicketDetail /> }
+        ]
+      },
       { path: "profile", element: <ProfilePage /> }
     ]
   },

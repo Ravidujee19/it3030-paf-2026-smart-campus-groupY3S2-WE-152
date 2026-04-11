@@ -1,6 +1,13 @@
 .ticket-detail-page {
-  padding: 2rem 0;
-  animation: fadeIn 0.6s ease-out;
+  padding: 1rem 0;
+  animation: fadeIn 0.5s ease-out;
+  /* FORCING GLOBAL DARK COLOR */
+  color: #333333;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .detail-header {
@@ -9,13 +16,16 @@
   align-items: flex-start;
   margin-bottom: 2rem;
   gap: 2rem;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 2rem;
 }
 
 .title-section h2 {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 800;
   margin: 0 0 1rem 0;
-  color: #fff;
+  /* FORCING DARK READABLE COLOR */
+  color: #333333;
 }
 
 .status-row {
@@ -28,92 +38,82 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  background: rgba(255, 255, 255, 0.03);
+  background: #f8fafc;
   padding: 8px 16px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid #e2e8f0;
 }
 
 .status-select-container label {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  color: #a0a0a0;
+  /* DARK READABLE COLOR */
+  color: #64748b;
   text-transform: uppercase;
+  margin: 0;
 }
 
 .status-dropdown {
   background: transparent;
   border: none;
-  color: #6c5ce7;
+  color: #6366f1;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   cursor: pointer;
   outline: none;
 }
 
-.status-dropdown option {
-  background: #1a1a1f;
-  color: white;
-}
-
 .detail-grid {
   display: grid;
-  grid-template-columns: 1fr 350px;
-  gap: 2.5rem;
+  grid-template-columns: 1fr 320px;
+  gap: 2rem;
   margin-bottom: 3rem;
 }
 
 .main-content {
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
+  gap: 2rem;
 }
 
 .info-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
   padding: 2rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .info-card h3 {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 700;
   margin: 0 0 1.5rem 0;
-  color: #fff;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  padding-bottom: 1rem;
+  /* FORCING DARK READABLE COLOR */
+  color: #333333;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 0.75rem;
 }
 
 .description-text {
-  color: #d1d1d1;
-  line-height: 1.8;
+  /* FORCING DARK READABLE COLOR */
+  color: #333333;
+  line-height: 1.7;
   white-space: pre-wrap;
-}
-
-.attachments-section {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  font-size: 1rem;
 }
 
 .attachments-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 1rem;
 }
 
 .attachment-item {
-  border-radius: 12px;
+  border-radius: 10px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid #e2e8f0;
   aspect-ratio: 16/10;
-  cursor: zoom-in;
   transition: transform 0.2s;
-}
-
-.attachment-item:hover {
-  transform: scale(1.02);
 }
 
 .attachment-item img {
@@ -136,9 +136,10 @@
 
 .meta-row {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   padding: 12px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid #f1f5f9;
+  gap: 4px;
 }
 
 .meta-row:last-child {
@@ -146,24 +147,27 @@
 }
 
 .meta-label {
-  color: #636e72;
-  font-size: 0.85rem;
-  font-weight: 600;
+  /* FORCING DARK READABLE COLOR */
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
 .meta-value {
-  color: #fff;
-  font-size: 0.85rem;
+  /* FORCING DARK READABLE COLOR */
+  color: #333333;
+  font-size: 0.95rem;
   font-weight: 600;
 }
 
-.priority-CRITICAL { color: #ff7675; }
-.priority-HIGH { color: #fab1a0; }
-.priority-MEDIUM { color: #ffeaa7; }
-.priority-LOW { color: #55efc4; }
+.priority-CRITICAL { color: #ef4444; }
+.priority-HIGH { color: #f97316; }
+.priority-MEDIUM { color: #eab308; }
+.priority-LOW { color: #22c55e; }
 
 .section-divider {
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-  margin-top: 3rem;
-  padding-top: 3rem;
+  border-top: 2px solid #f1f5f9;
+  margin-top: 2rem;
+  padding-top: 2rem;
 }

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import ticketService from '../../services/ticketService';
 import './TicketComments.css';
 
 /**
- * Ticket Comments component with full CRUD operations and ownership rules.
+ * Ticket Comments - Aligned with TicketCommentController.java
  */
 const TicketComments = ({ ticketId, currentUserId }) => {
+  const { user } = useAuth();
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(false);
@@ -13,7 +15,9 @@ const TicketComments = ({ ticketId, currentUserId }) => {
   const [editValue, setEditValue] = useState('');
 
   useEffect(() => {
-    fetchComments();
+    if (ticketId) {
+      fetchComments();
+    }
   }, [ticketId]);
 
   const fetchComments = async () => {
@@ -21,7 +25,7 @@ const TicketComments = ({ ticketId, currentUserId }) => {
       const data = await ticketService.getCommentsByTicket(ticketId);
       setComments(data);
     } catch (err) {
-      console.error('Error fetching comments:', err);
+      console.error('Failed to fetch comments:', err);
     }
   };
 
@@ -33,14 +37,13 @@ const TicketComments = ({ ticketId, currentUserId }) => {
       setLoading(true);
       const commentData = {
         userId: currentUserId,
-        content: newComment,
-        createdAt: new Date().toISOString()
+        content: newComment
       };
       await ticketService.addComment(ticketId, commentData);
       setNewComment('');
-      fetchComments(); // Refresh thread
+      fetchComments(); // Refresh list after successful post
     } catch (err) {
-      alert('Failed to post comment.');
+      // Error is already alerted by the service layer
     } finally {
       setLoading(false);
     }
@@ -51,38 +54,42 @@ const TicketComments = ({ ticketId, currentUserId }) => {
 
     try {
       await ticketService.deleteComment(commentId, currentUserId);
-      fetchComments(); // Refresh thread
+      fetchComments();
     } catch (err) {
-      alert('Failed to delete comment. You may not be the owner.');
+      // Error is already alerted by service
     }
-  };
-
-  const startEditing = (comment) => {
-    setEditingId(comment.id);
-    setEditValue(comment.content);
   };
 
   const handleUpdateComment = async (commentId) => {
+    if (!editValue.trim()) return;
+
     try {
-      await ticketService.editComment(commentId, { content: editValue });
+      // CRITICAL: Aligned with CommentRequest { userId, content }
+      await ticketService.editComment(commentId, { 
+        userId: currentUserId, 
+        content: editValue 
+      });
       setEditingId(null);
-      fetchComments(); // Refresh thread
+      fetchComments();
     } catch (err) {
-      alert('Failed to update comment.');
+      // Error is already alerted by service
     }
+  };
+
+  /**
+   * Ownership Enforcement: Check if user is the author or an Admin
+   */
+  const canModerate = (comment) => {
+    return comment.authorId === currentUserId || user?.role === 'ADMIN';
   };
 
   return (
     <div className="comments-section">
       <div className="comments-header">
-        <h3>
-          Discussion
-          <span className="comment-count">{comments.length}</span>
-        </h3>
+        <h3>Discussion Thread <span className="comment-count">{comments.length}</span></h3>
       </div>
 
-      {/* New Comment Input */}
-      <div className="comment-input-area">
+      <div className="comment-input-area" style={{ background: '#f8fafc', padding: '15px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '20px' }}>
         <form onSubmit={handlePostComment}>
           <textarea
             className="comment-textarea"
@@ -90,6 +97,7 @@ const TicketComments = ({ ticketId, currentUserId }) => {
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
             disabled={loading}
+            style={{ color: '#1e293b', background: '#fff' }}
           />
           <button 
             type="submit" 
@@ -101,58 +109,64 @@ const TicketComments = ({ ticketId, currentUserId }) => {
         </form>
       </div>
 
-      {/* Comments Thread */}
       <div className="comments-list">
-        {comments.map((comment) => (
-          <div key={comment.id} className="comment-item">
-            <div className="comment-meta">
-              <span className="comment-author">
-                User #{comment.userId} {comment.userId === currentUserId && '(You)'}
-              </span>
-              <span className="comment-date">
-                {new Date(comment.createdAt).toLocaleString()}
-              </span>
-            </div>
-
-            {editingId === comment.id ? (
-              <div className="edit-mode-area">
-                <textarea
-                  className="comment-textarea"
-                  value={editValue}
-                  onChange={(e) => setEditValue(e.target.value)}
-                />
-                <div style={{ display: 'flex', gap: '12px' }}>
-                  <button className="btn-action btn-save" onClick={() => handleUpdateComment(comment.id)}>Save Changes</button>
-                  <button className="btn-action btn-cancel-edit" onClick={() => setEditingId(null)}>Cancel</button>
-                </div>
+        {comments.length === 0 ? (
+          <p style={{ color: '#94a3b8', textAlign: 'center', padding: '20px' }}>No comments yet. Start the conversation!</p>
+        ) : (
+          comments.map((comment) => (
+            <div key={comment.id} className="comment-item" style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', marginBottom: '16px' }}>
+              <div className="comment-meta" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span className="comment-author" style={{ fontWeight: '700', color: '#6366f1', fontSize: '0.85rem' }}>
+                  {comment.authorName} {comment.authorId === currentUserId && '(You)'}
+                  {user?.role === 'ADMIN' && comment.authorId !== currentUserId && (
+                    <span style={{ color: '#ef4444', marginLeft: '5px' }}>[Moderator]</span>
+                  )}
+                </span>
+                <span className="comment-date" style={{ color: '#94a3b8', fontSize: '0.8rem' }}>
+                  {new Date(comment.createdAt).toLocaleString()}
+                  {comment.edited && <span style={{ fontStyle: 'italic', marginLeft: '5px' }}>(edited)</span>}
+                </span>
               </div>
-            ) : (
-              <>
-                <p className="comment-text">{comment.content}</p>
-                
-                {/* Ownership Rules: Only owner can Edit/Delete */}
-                {comment.userId === currentUserId && (
-                  <div className="comment-actions">
-                    <button 
-                      className="btn-action btn-edit"
-                      onClick={() => startEditing(comment)}
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      className="btn-action btn-delete"
-                      onClick={() => handleDeleteComment(comment.id)}
-                    >
-                      Delete
-                    </button>
+
+              {editingId === comment.id ? (
+                <div className="edit-mode-area">
+                  <textarea
+                    className="comment-textarea"
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    style={{ color: '#1e293b', background: '#fff', border: '1px solid #6366f1' }}
+                  />
+                  <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                    <button className="btn-action btn-save" onClick={() => handleUpdateComment(comment.id)}>Save Change</button>
+                    <button className="btn-action btn-cancel-edit" onClick={() => setEditingId(null)}>Cancel</button>
                   </div>
-                )}
-              </>
-            )}
-          </div>
-        ))}
-        {comments.length === 0 && (
-          <p style={{ color: '#636e72', textAlign: 'center' }}>No comments yet. Start the conversation!</p>
+                </div>
+              ) : (
+                <>
+                  <p className="comment-text" style={{ color: '#334155', fontSize: '0.95rem', lineHeight: '1.5' }}>{comment.content}</p>
+                  
+                  {canModerate(comment) && (
+                    <div className="comment-actions" style={{ borderTop: '1px solid #f1f5f9', marginTop: '12px', paddingTop: '8px', display: 'flex', gap: '15px' }}>
+                      <button 
+                        className="btn-action btn-edit" 
+                        onClick={() => { setEditingId(comment.id); setEditValue(comment.content); }}
+                        style={{ color: '#6366f1', padding: '0', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.85rem' }}
+                      >
+                        Edit
+                      </button>
+                      <button 
+                        className="btn-action btn-delete" 
+                        onClick={() => handleDeleteComment(comment.id)}
+                        style={{ color: '#ef4444', padding: '0', background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.85rem' }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          ))
         )}
       </div>
     </div>

@@ -4,39 +4,51 @@ import com.metricon.ticket.dto.StatusUpdateRequest;
 import com.metricon.ticket.dto.TicketCreateRequest;
 import com.metricon.ticket.dto.TicketResponse;
 import com.metricon.ticket.entity.Ticket;
+import com.metricon.ticket.entity.TicketAttachment;
+import com.metricon.ticket.entity.TicketPriority;
 import com.metricon.ticket.entity.TicketStatus;
+import com.metricon.ticket.repository.TicketAttachmentRepository;
+import com.metricon.ticket.service.FileStorageService;
 import com.metricon.ticket.service.TicketService;
+import com.metricon.user.entity.User;
+import com.metricon.user.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * REST controller for Maintenance & Incident Ticketing.
- * Exposes all 4 HTTP methods: GET, POST, PATCH, DELETE.
+ * Aligned with frontend 2-step creation workflow.
  */
 @RestController
 @RequestMapping("/api/tickets")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:5174"})
+@CrossOrigin(origins = { "http://localhost:5173", "http://localhost:5174" })
 public class TicketController {
 
     private final TicketService ticketService;
+    private final FileStorageService fileStorageService;
+    private final TicketAttachmentRepository attachmentRepository;
+    private final UserRepository userRepository;
 
-    public TicketController(TicketService ticketService) {
+    public TicketController(TicketService ticketService, 
+                            FileStorageService fileStorageService,
+                            TicketAttachmentRepository attachmentRepository,
+                            UserRepository userRepository) {
         this.ticketService = ticketService;
+        this.fileStorageService = fileStorageService;
+        this.attachmentRepository = attachmentRepository;
+        this.userRepository = userRepository;
     }
 
     // ──────────────────────────────────────────────
     // GET — Retrieve tickets
     // ──────────────────────────────────────────────
 
-    /**
-     * GET /api/tickets
-     * Retrieve all tickets. Optionally filter by status.
-     */
     @GetMapping
     public ResponseEntity<List<TicketResponse>> getAllTickets(
             @RequestParam(required = false) TicketStatus status) {
@@ -48,102 +60,107 @@ public class TicketController {
             tickets = ticketService.getAllTickets();
         }
 
-        List<TicketResponse> response = tickets.stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(tickets.stream().map(this::mapToResponse).collect(Collectors.toList()));
     }
 
-    /**
-     * GET /api/tickets/{id}
-     * Retrieve a single ticket by its ID.
-     */
     @GetMapping("/{id}")
     public ResponseEntity<TicketResponse> getTicketById(@PathVariable Long id) {
-        Ticket ticket = ticketService.getTicketById(id);
-        return ResponseEntity.ok(mapToResponse(ticket));
+        return ResponseEntity.ok(mapToResponse(ticketService.getTicketById(id)));
     }
 
-    /**
-     * GET /api/tickets/user/{userId}
-     * Retrieve all tickets created by a specific user.
-     */
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<TicketResponse>> getTicketsByUser(@PathVariable Long userId) {
-        List<TicketResponse> response = ticketService.getTicketsByCreator(userId).stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ticketService.getTicketsByCreator(userId).stream()
+                .map(this::mapToResponse).collect(Collectors.toList()));
     }
 
-    /**
-     * GET /api/tickets/assigned/{technicianId}
-     * Retrieve all tickets assigned to a specific technician.
-     */
     @GetMapping("/assigned/{technicianId}")
     public ResponseEntity<List<TicketResponse>> getTicketsByAssignee(@PathVariable Long technicianId) {
-        List<TicketResponse> response = ticketService.getTicketsByAssignee(technicianId).stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ticketService.getTicketsByAssignee(technicianId).stream()
+                .map(this::mapToResponse).collect(Collectors.toList()));
     }
 
     // ──────────────────────────────────────────────
     // POST — Create a new ticket
     // ──────────────────────────────────────────────
 
-    /**
-     * POST /api/tickets
-     * Create a new maintenance/incident ticket.
-     */
     @PostMapping
     public ResponseEntity<TicketResponse> createTicket(@Valid @RequestBody TicketCreateRequest request) {
         Ticket ticket = mapFromCreateRequest(request);
         Ticket savedTicket = ticketService.createTicket(ticket, request.getCreatedByUserId());
-
         return ResponseEntity.status(HttpStatus.CREATED).body(mapToResponse(savedTicket));
     }
 
     // ──────────────────────────────────────────────
-    // PATCH — Update ticket status (workflow)
+    // ATTACHMENTS — Fixed Multi-upload with Persistence
     // ──────────────────────────────────────────────
 
     /**
-     * PATCH /api/tickets/{id}/status
-     * Update the status of a ticket following the allowed workflow transitions.
+     * POST /api/tickets/{id}/attachments
+     * Aligned with frontend two-step creation. Handles array of files and identification of uploader.
      */
+    @PostMapping("/{id}/attachments")
+    public ResponseEntity<Void> uploadAttachments(
+            @PathVariable Long id,
+            @RequestParam("attachments") MultipartFile[] files,
+            @RequestParam Long userId) {
+
+        Ticket ticket = ticketService.getTicketById(id);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Uploader (User) not found"));
+
+        for (MultipartFile file : files) {
+            if (file.isEmpty()) continue;
+
+            // 1. Store on Disk
+            String fileUrl = fileStorageService.storeFile(file, id);
+            
+            // 2. Persist in DB
+            TicketAttachment attachment = new TicketAttachment();
+            attachment.setFileUrl(fileUrl);
+            attachment.setFileName(file.getOriginalFilename());
+            attachment.setContentType(file.getContentType());
+            attachment.setFileSize(file.getSize());
+            attachment.setTicket(ticket);
+            attachment.setUploadedBy(user);
+            
+            attachmentRepository.save(attachment);
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    // ──────────────────────────────────────────────
+    // PATCH — Workflow Transitions
+    // ──────────────────────────────────────────────
+
     @PatchMapping("/{id}/status")
     public ResponseEntity<TicketResponse> updateTicketStatus(
             @PathVariable Long id,
             @Valid @RequestBody StatusUpdateRequest request) {
-
-        Ticket updatedTicket = ticketService.updateTicketStatus(id, request.getStatus());
-        return ResponseEntity.ok(mapToResponse(updatedTicket));
+        return ResponseEntity.ok(mapToResponse(ticketService.updateTicketStatus(id, request.getStatus())));
     }
 
-    /**
-     * PATCH /api/tickets/{id}/assign
-     * Assign a technician to a ticket.
-     */
+    @PatchMapping("/{id}/priority")
+    public ResponseEntity<TicketResponse> updateTicketPriority(
+            @PathVariable Long id,
+            @RequestParam String priority) {
+        Ticket ticket = new Ticket();
+        ticket.setPriority(TicketPriority.valueOf(priority));
+        return ResponseEntity.ok(mapToResponse(ticketService.updateTicket(id, ticket)));
+    }
+
     @PatchMapping("/{id}/assign")
     public ResponseEntity<TicketResponse> assignTechnician(
             @PathVariable Long id,
             @RequestParam Long technicianId) {
-
-        Ticket updatedTicket = ticketService.assignTechnician(id, technicianId);
-        return ResponseEntity.ok(mapToResponse(updatedTicket));
+        return ResponseEntity.ok(mapToResponse(ticketService.assignTechnician(id, technicianId)));
     }
 
     // ──────────────────────────────────────────────
-    // DELETE — Remove a ticket
+    // DELETE
     // ──────────────────────────────────────────────
 
-    /**
-     * DELETE /api/tickets/{id}
-     * Delete a ticket and all its associated comments and attachments.
-     * Returns HTTP 204 No Content on success.
-     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTicket(@PathVariable Long id) {
         ticketService.deleteTicket(id);
@@ -151,61 +168,53 @@ public class TicketController {
     }
 
     // ──────────────────────────────────────────────
-    // MAPPER: Entity <-> DTO
+    // MAPPER
     // ──────────────────────────────────────────────
 
-    /**
-     * Maps a Ticket entity to a TicketResponse DTO.
-     */
     private TicketResponse mapToResponse(Ticket ticket) {
-        TicketResponse response = new TicketResponse();
-        response.setId(ticket.getId());
-        response.setTitle(ticket.getTitle());
-        response.setDescription(ticket.getDescription());
-        response.setCategory(ticket.getCategory());
-        response.setPriority(ticket.getPriority());
-        response.setStatus(ticket.getStatus());
-        response.setLocation(ticket.getLocation());
-        response.setResourceName(ticket.getResourceName());
-        response.setContactEmail(ticket.getContactEmail());
-        response.setContactPhone(ticket.getContactPhone());
-        response.setResolutionNotes(ticket.getResolutionNotes());
+        TicketResponse res = new TicketResponse();
+        res.setId(ticket.getId());
+        res.setTitle(ticket.getTitle());
+        res.setDescription(ticket.getDescription());
+        res.setCategory(ticket.getCategory());
+        res.setPriority(ticket.getPriority());
+        res.setStatus(ticket.getStatus());
+        res.setLocation(ticket.getLocation());
+        res.setResourceName(ticket.getResourceName());
+        res.setContactEmail(ticket.getContactEmail());
+        res.setContactPhone(ticket.getContactPhone());
+        res.setResolutionNotes(ticket.getResolutionNotes());
 
-        // Flatten user references
         if (ticket.getCreatedBy() != null) {
-            response.setCreatedById(ticket.getCreatedBy().getId());
-            response.setCreatedByName(ticket.getCreatedBy().getName());
+            res.setCreatedById(ticket.getCreatedBy().getId());
+            res.setCreatedByName(ticket.getCreatedBy().getName());
         }
         if (ticket.getAssignedTo() != null) {
-            response.setAssignedToId(ticket.getAssignedTo().getId());
-            response.setAssignedToName(ticket.getAssignedTo().getName());
+            res.setAssignedToId(ticket.getAssignedTo().getId());
+            res.setAssignedToName(ticket.getAssignedTo().getName());
         }
 
-        response.setCreatedAt(ticket.getCreatedAt());
-        response.setUpdatedAt(ticket.getUpdatedAt());
-        response.setResolvedAt(ticket.getResolvedAt());
-        response.setClosedAt(ticket.getClosedAt());
+        res.setCreatedAt(ticket.getCreatedAt());
+        res.setUpdatedAt(ticket.getUpdatedAt());
+        res.setResolvedAt(ticket.getResolvedAt());
+        res.setClosedAt(ticket.getClosedAt());
 
-        // Collection sizes (avoids serializing full lists)
-        response.setCommentCount(ticket.getComments() != null ? ticket.getComments().size() : 0);
-        response.setAttachmentCount(ticket.getAttachments() != null ? ticket.getAttachments().size() : 0);
+        res.setCommentCount(ticket.getComments() != null ? ticket.getComments().size() : 0);
+        res.setAttachmentCount(ticket.getAttachments() != null ? ticket.getAttachments().size() : 0);
 
-        return response;
+        return res;
     }
 
-    /**
-     * Maps a TicketCreateRequest DTO to a Ticket entity.
-     */
-    private Ticket mapFromCreateRequest(TicketCreateRequest request) {
-        Ticket ticket = new Ticket();
-        ticket.setTitle(request.getTitle());
-        ticket.setDescription(request.getDescription());
-        ticket.setCategory(request.getCategory());
-        ticket.setPriority(request.getPriority());
-        ticket.setLocation(request.getLocation());
-        ticket.setResourceName(request.getResourceName());
-        ticket.setContactEmail(request.getContactEmail());
-        ticket.setContactPhone(request.getContactPhone());
-        return ticket;
+    private Ticket mapFromCreateRequest(TicketCreateRequest req) {
+        Ticket t = new Ticket();
+        t.setTitle(req.getTitle());
+        t.setDescription(req.getDescription());
+        t.setCategory(req.getCategory());
+        t.setPriority(req.getPriority());
+        t.setLocation(req.getLocation());
+        t.setResourceName(req.getResourceName());
+        t.setContactEmail(req.getContactEmail());
+        t.setContactPhone(req.getContactPhone());
+        return t;
     }
 }
