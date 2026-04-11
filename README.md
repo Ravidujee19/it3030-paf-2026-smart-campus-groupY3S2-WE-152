@@ -164,6 +164,28 @@ All API endpoints are prefixed with `/api`.
 
 ---
 
+## 🧪 Testing
+
+The project maintains a high level of code quality through a robust backend test suite.
+
+### Backend Tests
+The backend uses **JUnit 5** and **Mockito** for unit testing, and an **H2 In-memory Database** for integration testing.
+
+- **Unit Tests**: Focus on service layer logic, isolating components using Mockito.
+- **Integration Tests**: Verify application context loading and repository interactions.
+
+**To run the tests:**
+1. Navigate to the `backend/` directory.
+2. Execute the following command:
+   ```bash
+   ./mvnw test
+   ```
+
+### Frontend Tests (Roadmap)
+Frontend testing is currently identified on the roadmap. We recommend using **Vitest** and **React Testing Library** for component validation.
+
+---
+
 ## 📊 Database Schema (Overview)
 
 ```mermaid
