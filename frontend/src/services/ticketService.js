@@ -84,8 +84,8 @@ class TicketService {
       // Step 1: Create text record (JSON)
       const jsonPayload = {
         ...ticketData,
-        priority: this.mapToEnum(ticketData.priority),
-        category: this.mapToEnum(ticketData.category)
+        priority: mapToEnum(ticketData.priority),
+        category: mapToEnum(ticketData.category)
       };
 
       const response = await apiClient.post('/tickets', jsonPayload);
@@ -130,6 +130,23 @@ class TicketService {
       });
       return response.data;
     } catch (error) { this.handleError(error, 'updating priority'); }
+  }
+
+  async updateTicket(id, ticketData) {
+    try {
+      const payload = {
+        title: ticketData.title,
+        description: ticketData.description,
+        category: ticketData.category ? mapToEnum(ticketData.category) : undefined,
+        priority: ticketData.priority ? mapToEnum(ticketData.priority) : undefined,
+        location: ticketData.location,
+        resourceName: ticketData.resourceName,
+        contactEmail: ticketData.contactEmail,
+        contactPhone: ticketData.contactPhone
+      };
+      const response = await apiClient.patch(`/tickets/${id}`, payload);
+      return response.data;
+    } catch (error) { this.handleError(error, 'updating ticket'); }
   }
 
   // ──────────────────────────────────────────────

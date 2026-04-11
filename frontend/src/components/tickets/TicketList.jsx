@@ -4,6 +4,8 @@ import { useAuth } from '../../context/AuthContext';
 import ticketService from '../../services/ticketService';
 import './TicketList.css';
 
+const API_BASE_URL = 'http://localhost:8081';
+
 const TicketList = () => {
   const { user, loading: authLoading } = useAuth();
   const [tickets, setTickets] = useState([]);
@@ -26,6 +28,8 @@ const TicketList = () => {
       setLoading(true);
       setError(null);
       const data = await ticketService.getAllTickets();
+      console.log('Tickets loaded:', data); // Debug log
+      console.log('First ticket attachments:', data[0]?.attachments); // Debug log
       setTickets(data);
     } catch (err) {
       // CRITICAL FIX: Detailed Error Logging
@@ -35,6 +39,24 @@ const TicketList = () => {
       console.error('Fetch Error:', detailedMessage);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteTicket = async (ticketId, ticketTitle) => {
+    // Confirmation dialog
+    if (!window.confirm(`Are you sure you want to delete the ticket "${ticketTitle}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      await ticketService.deleteTicket(ticketId);
+      alert(`Ticket "${ticketTitle}" has been deleted successfully.`);
+      // Refresh the ticket list
+      setTickets(tickets.filter(t => t.id !== ticketId));
+    } catch (err) {
+      const errorMessage = err.message || 'Failed to delete ticket';
+      alert(`Error deleting ticket: ${errorMessage}`);
+      console.error('Delete Error:', err);
     }
   };
 
@@ -95,8 +117,23 @@ const TicketList = () => {
       </div>
 
       <div className="tickets-grid">
-        {filteredTickets.map((ticket) => (
+        {filteredTickets.map((ticket) => {
+          console.log(`Ticket ${ticket.id}:`, { attachments: ticket.attachments, attachmentCount: ticket.attachmentCount });
+          return (
           <div key={ticket.id} className="ticket-card">
+            {ticket.attachments && ticket.attachments.length > 0 && ticket.attachments[0]?.fileUrl ? (
+              <div className="card-image">
+                <img src={`${API_BASE_URL}/${ticket.attachments[0].fileUrl}`} alt={ticket.title} onError={(e) => {
+                  console.error('Image failed to load:', ticket.attachments[0].fileUrl);
+                  e.target.style.display = 'none';
+                }} />
+              </div>
+            ) : (
+              <div className="card-image" style={{ background: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999' }}>
+                {ticket.attachmentCount > 0 ? 'No image URL' : 'No attachments'}
+              </div>
+            )}
+            
             <div className="card-top">
               <span className="category-tag">{ticket.category}</span>
               <span className={`status-badge status-${ticket.status.toLowerCase()}`}>
@@ -126,9 +163,16 @@ const TicketList = () => {
               >
                 View Details
               </button>
+              <button 
+                className="btn-delete" 
+                onClick={() => handleDeleteTicket(ticket.id, ticket.title)}
+              >
+                Delete
+              </button>
             </div>
           </div>
-        ))}
+        );
+        })}
       </div>
     </div>
   );

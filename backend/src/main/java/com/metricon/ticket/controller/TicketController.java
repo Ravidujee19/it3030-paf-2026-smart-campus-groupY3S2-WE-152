@@ -1,5 +1,6 @@
 package com.metricon.ticket.controller;
 
+import com.metricon.ticket.dto.AttachmentResponse;
 import com.metricon.ticket.dto.StatusUpdateRequest;
 import com.metricon.ticket.dto.TicketCreateRequest;
 import com.metricon.ticket.dto.TicketResponse;
@@ -150,6 +151,13 @@ public class TicketController {
         return ResponseEntity.ok(mapToResponse(ticketService.updateTicket(id, ticket)));
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<TicketResponse> updateTicket(
+            @PathVariable Long id,
+            @Valid @RequestBody Ticket updatedTicket) {
+        return ResponseEntity.ok(mapToResponse(ticketService.updateTicket(id, updatedTicket)));
+    }
+
     @PatchMapping("/{id}/assign")
     public ResponseEntity<TicketResponse> assignTechnician(
             @PathVariable Long id,
@@ -201,7 +209,32 @@ public class TicketController {
 
         res.setCommentCount(ticket.getComments() != null ? ticket.getComments().size() : 0);
         res.setAttachmentCount(ticket.getAttachments() != null ? ticket.getAttachments().size() : 0);
+        
+        // Map attachments with full details for frontend display
+        if (ticket.getAttachments() != null && !ticket.getAttachments().isEmpty()) {
+            res.setAttachments(ticket.getAttachments().stream()
+                    .map(this::mapAttachmentToResponse)
+                    .collect(Collectors.toList()));
+        } else {
+            // Always initialize with empty list instead of null
+            res.setAttachments(new java.util.ArrayList<>());
+        }
 
+        return res;
+    }
+
+    private AttachmentResponse mapAttachmentToResponse(TicketAttachment attachment) {
+        AttachmentResponse res = new AttachmentResponse();
+        res.setId(attachment.getId());
+        res.setFileUrl(attachment.getFileUrl());
+        res.setFileName(attachment.getFileName());
+        res.setContentType(attachment.getContentType());
+        res.setFileSize(attachment.getFileSize());
+        if (attachment.getUploadedBy() != null) {
+            res.setUploadedById(attachment.getUploadedBy().getId());
+            res.setUploadedByName(attachment.getUploadedBy().getName());
+        }
+        res.setUploadedAt(attachment.getUploadedAt());
         return res;
     }
 
