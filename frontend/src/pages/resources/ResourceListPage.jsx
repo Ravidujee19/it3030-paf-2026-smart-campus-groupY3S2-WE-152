@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import resourceService from '../../services/resourceService';
 import ResourceCard from './components/ResourceCard';
 import ResourceModal from './components/ResourceModal';
+import ResourceDetailModal from './components/ResourceDetailModal';
+import BookingRequestModal from '../bookings/components/BookingRequestModal';
 import './ResourceListPage.css';
 
 const ResourceListPage = ({ refreshTrigger, hideHeader = false }) => {
@@ -14,8 +16,10 @@ const ResourceListPage = ({ refreshTrigger, hideHeader = false }) => {
     location: '',
   });
 
-  // Edit Modal State
+  // Modal States
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedResource, setSelectedResource] = useState(null);
 
   useEffect(() => {
@@ -40,7 +44,10 @@ const ResourceListPage = ({ refreshTrigger, hideHeader = false }) => {
       await resourceService.deleteResource(id);
       setResources((prev) => prev.filter((r) => r.id !== id));
     } catch (err) {
-      alert('Failed to delete resource. Please try again.');
+      const errorMessage = err.response && err.response.data && err.response.data.message 
+        ? err.response.data.message 
+        : 'Failed to delete resource. Please try again or check if it has existing bookings.';
+      alert(errorMessage);
     }
   };
 
@@ -51,6 +58,21 @@ const ResourceListPage = ({ refreshTrigger, hideHeader = false }) => {
 
   const handleUpdateSuccess = () => {
     fetchResources();
+  };
+
+  const handleBook = (resource) => {
+    setSelectedResource(resource);
+    setIsBookingModalOpen(true);
+  };
+
+  const handleViewDetails = (resource) => {
+    setSelectedResource(resource);
+    setIsDetailModalOpen(true);
+  };
+
+  const handleBookingSuccess = () => {
+    alert('Booking request submitted successfully! An administrator will review it shortly.');
+    setIsBookingModalOpen(false);
   };
 
   const handleFilterChange = (e) => {
@@ -123,6 +145,8 @@ const ResourceListPage = ({ refreshTrigger, hideHeader = false }) => {
                 resource={resource} 
                 onDelete={handleDelete}
                 onEdit={() => handleEdit(resource)}
+                onBook={handleBook}
+                onViewDetails={handleViewDetails}
               />
             ))
           ) : (
@@ -144,6 +168,25 @@ const ResourceListPage = ({ refreshTrigger, hideHeader = false }) => {
         onSuccess={handleUpdateSuccess}
         initialData={selectedResource}
         mode="EDIT"
+      />
+
+      <ResourceDetailModal
+        isOpen={isDetailModalOpen}
+        onClose={() => {
+          setIsDetailModalOpen(false);
+          setSelectedResource(null);
+        }}
+        resource={selectedResource}
+      />
+
+      <BookingRequestModal
+        isOpen={isBookingModalOpen}
+        onClose={() => {
+          setIsBookingModalOpen(false);
+          setSelectedResource(null);
+        }}
+        resource={selectedResource}
+        onSuccess={handleBookingSuccess}
       />
     </div>
   );

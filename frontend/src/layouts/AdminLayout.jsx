@@ -1,5 +1,6 @@
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useNotifications } from "../context/NotificationContext";
 import AvatarCard from "../components/common/AvatarCard";
 import "../styles/adminLayout.css";
 const Icons = {
@@ -31,6 +32,7 @@ const Icons = {
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
+  const { unreadCount } = useNotifications();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -53,8 +55,8 @@ export default function AdminLayout() {
     <div className="admin-layout">
       <aside className="admin-sidebar">
         <div className="admin-logo-area">
-          <div className="admin-logo-icon">S</div>
-          Smart Campus
+          <div className="admin-logo-icon">M</div>
+          Metricon
         </div>
         
         <nav className="admin-nav-menu">
@@ -79,24 +81,50 @@ export default function AdminLayout() {
           <h2 className="admin-header-title">Admin Hub</h2>
           
           <div className="admin-header-user">
-            <span>{user?.name || "Admin"}</span>
-            <div className="admin-avatar">
-              {(user?.name || "A").charAt(0).toUpperCase()}
-            </div>
+            {/* Notification Bell */}
+            <Link to="/admin/notifications" className="admin-bell-btn" title="View Notifications">
+              <Icons.Notifications />
+              {unreadCount > 0 && <span className="admin-bell-badge">{unreadCount}</span>}
+            </Link>
+
+            <Link to="/admin/profile" className="admin-header-user-clickable" title="View Profile">
+              <div className="user-name-wrapper">
+                <span className="user-name-text">{user?.name || "Admin"}</span>
+                <span className="user-role-text">Administrator</span>
+              </div>
+              
+              <div className="admin-avatar">
+                {(user?.name || "A").charAt(0).toUpperCase()}
+              </div>
+            </Link>
+            
             <button 
               onClick={handleLogout} 
-              className="btn-primary"
-              style={{ padding: "6px 12px", display: "flex", gap: "6px", alignItems: "center" }}
+              className="btn-danger logout-btn"
+              style={{ padding: "8px 16px", display: "flex", gap: "6px", alignItems: "center" }}
             >
-              <span style={{width: '16px', height: '16px'}}><Icons.Logout /></span>
+              <Icons.Logout />
               Logout
             </button>
           </div>
         </header>
 
-        <main className="admin-content">
-          <Outlet />
-        </main>
+        <div className="admin-scroll-area">
+          <main className="admin-content">
+            <Outlet />
+          </main>
+
+          <footer className="admin-footer">
+            <div className="admin-footer-copy">
+              &copy; {new Date().getFullYear()} Metricon Campus Management System. All rights reserved.
+            </div>
+            <div className="admin-footer-links">
+              <Link to="/admin" className="admin-footer-link">Dashboard</Link>
+              <Link to="/admin/notifications" className="admin-footer-link">Support</Link>
+              <span className="admin-footer-link">v1.2.4-stable</span>
+            </div>
+          </footer>
+        </div>
       </div>
     </div>
   );

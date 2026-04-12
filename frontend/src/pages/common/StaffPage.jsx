@@ -1,6 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import MotivationalQuotes from '../../components/staff/MotivationalQuotes';
+import campusHero from '../../assets/campus-hero.png';
+import quickActionsBg from '../../assets/quick-actions-bg.png';
 import './StaffDashboard.css';
 
 const StaffPage = () => {
@@ -31,10 +34,13 @@ const StaffPage = () => {
 
   return (
     <div className="staff-dashboard">
-      <header className="dashboard-hero">
+      <header 
+        className="dashboard-hero" 
+        style={{ backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.7)), url(${campusHero})` }}
+      >
         <div className="hero-content">
           <h1>Staff Hub</h1>
-          <p>Welcome back, <strong>{user?.name || 'Staff Member'}</strong>. Here's what's happening on campus today.</p>
+          <p>Welcome back, <strong>{user?.name || 'savinda thennakoon'}</strong>. Here's what's happening on campus today.</p>
           
           <div className="hero-stats">
             <div className="stat-item">
@@ -53,27 +59,35 @@ const StaffPage = () => {
         </div>
       </header>
 
+      <MotivationalQuotes />
+
       <div className="dashboard-sections">
-        <section className="section-card quick-actions">
-          <h2>Quick Actions</h2>
-          <div className="quick-actions-grid">
-            <Link to="/staff/facilities" className="action-btn">
-              <div className="action-icon"><Icons.Catalogue /></div>
-              <span>View Catalogue</span>
-            </Link>
-            <Link to="/staff/bookings" className="action-btn">
-              <div className="action-icon"><Icons.Booking /></div>
-              <span>My Bookings</span>
-            </Link>
-            <Link to="/staff/tickets" className="action-btn">
-              <div className="action-icon"><Icons.Ticket /></div>
-              <span>New Ticket</span>
-            </Link>
-            <Link to="/profile" className="action-btn">
-              <div className="action-icon"><Icons.Notification /></div>
-              <span>My Profile</span>
-            </Link>
+        <section className="section-card quick-actions-container">
+          <div className="quick-actions-main">
+            <h2>Quick Actions</h2>
+            <div className="quick-actions-grid">
+              <Link to="/staff/facilities" className="action-btn">
+                <div className="action-icon"><Icons.Catalogue /></div>
+                <span>View Catalogue</span>
+              </Link>
+              <Link to="/staff/bookings" className="action-btn">
+                <div className="action-icon"><Icons.Booking /></div>
+                <span>My Bookings</span>
+              </Link>
+              <Link to="/staff/tickets" className="action-btn">
+                <div className="action-icon"><Icons.Ticket /></div>
+                <span>New Ticket</span>
+              </Link>
+              <Link to="/profile" className="action-btn">
+                <div className="action-icon"><Icons.Notification /></div>
+                <span>My Profile</span>
+              </Link>
+            </div>
           </div>
+          <div 
+            className="quick-actions-banner"
+            style={{ backgroundImage: `url(${quickActionsBg})` }}
+          />
         </section>
 
         <section className="section-card recent-updates">

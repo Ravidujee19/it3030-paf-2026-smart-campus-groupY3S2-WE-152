@@ -3,6 +3,9 @@ package com.metricon.booking.service;
 import com.metricon.booking.dto.BookingDto;
 import com.metricon.booking.entity.Booking;
 import com.metricon.booking.repository.BookingRepository;
+import com.metricon.common.enums.NotificationType;
+import com.metricon.common.enums.RoleName;
+import com.metricon.notification.service.NotificationService;
 import com.metricon.resource.entity.Resource;
 import com.metricon.resource.repository.ResourceRepository;
 import com.metricon.user.entity.User;
@@ -24,6 +27,7 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final ResourceRepository resourceRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public BookingDto createBooking(BookingDto dto, Long userId) {
@@ -58,7 +62,17 @@ public class BookingService {
                 .status(Booking.BookingStatus.PENDING)
                 .build();
 
-        return mapToDto(bookingRepository.save(booking));
+        Booking savedBooking = bookingRepository.save(booking);
+        BookingDto responseDto = mapToDto(savedBooking);
+
+        notificationService.notifyRoles(
+            List.of(RoleName.STAFF, RoleName.ADMIN),
+            "New Booking Request",
+            "A new booking request for '" + savedBooking.getResource().getName() + "' by " + savedBooking.getUser().getName() + " is pending review.",
+            NotificationType.INFO
+        );
+
+        return responseDto;
     }
 
     @Transactional
@@ -77,7 +91,18 @@ public class BookingService {
         booking.setStatus(newStatus);
         booking.setRejectReason(reason);
 
-        return mapToDto(bookingRepository.save(booking));
+        Booking savedBooking = bookingRepository.save(booking);
+        
+        String statusLabel = newStatus == Booking.BookingStatus.APPROVED ? "Approved" : "Rejected";
+        notificationService.createNotification(
+            savedBooking.getUser().getEmail(),
+            "Booking " + statusLabel,
+            "Your booking for '" + savedBooking.getResource().getName() + "' has been " + statusLabel.toLowerCase() + "." + 
+            (reason != null && !reason.isEmpty() ? " Reason: " + reason : ""),
+            newStatus == Booking.BookingStatus.APPROVED ? NotificationType.SUCCESS : NotificationType.WARNING
+        );
+
+        return mapToDto(savedBooking);
     }
 
     @Transactional

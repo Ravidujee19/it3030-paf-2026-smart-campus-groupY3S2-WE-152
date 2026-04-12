@@ -1,14 +1,28 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
 import BookingRequestModal from '../../bookings/components/BookingRequestModal';
+import ResourceDetailModal from './ResourceDetailModal';
 import './ResourceCard.css';
 
-const ResourceCard = ({ resource, onDelete, onEdit }) => {
+// Import category-specific images
+import lectureHallImg from '../../../assets/resources/lecture-hall.png';
+import labImg from '../../../assets/resources/lab.png';
+import meetingRoomImg from '../../../assets/resources/meeting-room.png';
+import equipmentImg from '../../../assets/resources/equipment.png';
+
+const TYPE_IMAGE_MAP = {
+  'LECTURE_HALL': lectureHallImg,
+  'LAB': labImg,
+  'MEETING_ROOM': meetingRoomImg,
+  'EQUIPMENT': equipmentImg
+};
+
+const ResourceCard = ({ resource, onDelete, onEdit, onBook, onViewDetails }) => {
   const { id, name, type, capacity, location, status } = resource;
   const { user } = useAuth();
-  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   
   const isAdmin = user?.role === 'ADMIN';
+  const isStudent = user?.role === 'STUDENT';
 
   const getStatusClass = (status) => {
     return status === 'ACTIVE' ? 'status-active' : 'status-inactive';
@@ -36,17 +50,26 @@ const ResourceCard = ({ resource, onDelete, onEdit }) => {
     onEdit();
   };
 
-  const handleBookingSuccess = () => {
-    alert('Booking request submitted successfully! An administrator will review it shortly.');
-  };
-
   return (
     <div className="resource-card">
+      <div className="resource-card-image-container">
+        <img 
+          src={TYPE_IMAGE_MAP[type] || lectureHallImg} 
+          alt={name} 
+          className="resource-card-image"
+        />
+        <div className="image-overlay">
+          <span className={`status-badge-compact ${getStatusClass(status)}`}>
+            {status}
+          </span>
+        </div>
+      </div>
+      
       <div className="resource-card-header">
         <div className="header-left">
           <span className="resource-icon">{getTypeIcon(type)}</span>
-          <span className={`status-badge ${getStatusClass(status)}`}>
-            {status}
+          <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--admin-text-light)' }}>
+            {type.replace('_', ' ')}
           </span>
         </div>
         {isAdmin && (
@@ -83,25 +106,37 @@ const ResourceCard = ({ resource, onDelete, onEdit }) => {
         </div>
       </div>
       <div className="resource-card-footer">
-        {!isAdmin ? (
+        {isStudent ? (
           <button 
             className="view-details-btn" 
-            style={{ background: 'linear-gradient(135deg, #6366f1, #818cf8)' }}
-            onClick={() => setIsBookingModalOpen(true)}
+            style={{ background: 'linear-gradient(135deg, #4b5563, #6b7280)' }}
+            onClick={() => onViewDetails && onViewDetails(resource)}
           >
-            Book Now
+            View Details
           </button>
+        ) : !isAdmin ? (
+          <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+            <button 
+              className="view-details-btn" 
+              style={{ background: '#f1f5f9', color: '#475569', border: '1px solid #e2e8f0', flex: 1 }}
+              onClick={() => onViewDetails && onViewDetails(resource)}
+            >
+              Details
+            </button>
+            <button 
+              className="view-details-btn" 
+              style={{ background: 'linear-gradient(135deg, #6366f1, #818cf8)', flex: 2 }}
+              onClick={() => onBook && onBook(resource)}
+            >
+              Book Now
+            </button>
+          </div>
         ) : (
-          <button className="view-details-btn">View Details</button>
+          <button className="view-details-btn" onClick={() => onViewDetails && onViewDetails(resource)}>
+            View Details
+          </button>
         )}
       </div>
-
-      <BookingRequestModal 
-        isOpen={isBookingModalOpen}
-        onClose={() => setIsBookingModalOpen(false)}
-        resource={resource}
-        onSuccess={handleBookingSuccess}
-      />
     </div>
   );
 };

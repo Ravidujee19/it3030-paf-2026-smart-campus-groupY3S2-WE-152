@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import adminHero from '../../assets/admin-hero.png';
 import './AdminDashboard.css';
 
 // Inline Professional SVGs (Since external icons were blocked)
@@ -50,13 +51,24 @@ const AdminDashboard = () => {
 
   return (
     <div className="dashboard-container">
-      <header className="dashboard-header">
+      <header 
+        className="dashboard-header"
+        style={{ 
+          backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.5), rgba(15, 23, 42, 0.75)), url(${adminHero})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          padding: '4rem 3rem',
+          borderRadius: '24px',
+          marginBottom: '2rem',
+          color: 'white'
+        }}
+      >
         <div>
-          <h1>Analytical Hub</h1>
-          <p>Real-time campus utilization and resource intelligence.</p>
+          <h1 style={{ color: 'white', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>Analytical Hub</h1>
+          <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '1.2rem' }}>Real-time campus utilization and resource intelligence.</p>
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
-          <button className="kpi-trend positive" onClick={fetchAnalytics} style={{ border: 'none', cursor: 'pointer', padding: '10px 16px' }}>
+          <button className="kpi-trend positive" onClick={fetchAnalytics} style={{ border: 'none', cursor: 'pointer', padding: '10px 24px', borderRadius: '12px' }}>
             Refinement Sync ✓
           </button>
         </div>
@@ -191,43 +203,45 @@ const AdminDashboard = () => {
               ))}
             </div>
           </div>
+
+          {/* NEW BOTTOM INSIGHTS GRID */}
+          <div className="bottom-insights-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px' }}>
+            <div className="chart-card" style={{ padding: '24px', marginBottom: 0 }}>
+              <h3 style={{ marginBottom: '20px', fontSize: '1.1rem' }}><Icons.Alert /> Smart Insights</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {insights.length > 0 ? insights.map((insight, i) => (
+                  <div key={i} className={`insight-card ${insight.severity.toLowerCase()}`}>
+                    <span className="type">{insight.type}</span>
+                    <p className="msg">{insight.message}</p>
+                  </div>
+                )) : (
+                  <p style={{ color: '#94a3b8', fontSize: '0.875rem', textAlign: 'center', padding: '20px' }}>
+                    No anomalies detected. Campus is performing at peak efficiency.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="chart-card" style={{ padding: '24px', background: 'var(--admin-secondary)', color: 'white', marginBottom: 0 }}>
+              <h3 style={{ color: 'white', marginBottom: '16px' }}>Zone Distribution</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {Object.entries(locations).map(([loc, count]) => (
+                  <div key={loc} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.875rem', fontWeight: 600, opacity: 0.8 }}>{loc}</span>
+                    <span style={{ 
+                      background: 'rgba(255,255,255,0.1)', 
+                      padding: '2px 10px', 
+                      borderRadius: '99px',
+                      fontSize: '0.75rem',
+                      fontWeight: 800
+                    }}>{count} active</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </main>
 
-        <aside className="insights-sidebar">
-          <div className="chart-card" style={{ padding: '24px' }}>
-            <h3 style={{ marginBottom: '20px', fontSize: '1.1rem' }}><Icons.Alert /> Smart Insights</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {insights.length > 0 ? insights.map((insight, i) => (
-                <div key={i} className={`insight-card ${insight.severity.toLowerCase()}`}>
-                  <span className="type">{insight.type}</span>
-                  <p className="msg">{insight.message}</p>
-                </div>
-              )) : (
-                <p style={{ color: '#94a3b8', fontSize: '0.875rem', textAlign: 'center', padding: '20px' }}>
-                  No anomalies detected. Campus is performing at peak efficiency.
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div className="chart-card" style={{ padding: '24px', background: 'var(--admin-secondary)', color: 'white' }}>
-            <h3 style={{ color: 'white', marginBottom: '16px' }}>Zone Distribution</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {Object.entries(locations).map(([loc, count]) => (
-                <div key={loc} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.875rem', fontWeight: 600, opacity: 0.8 }}>{loc}</span>
-                  <span style={{ 
-                    background: 'rgba(255,255,255,0.1)', 
-                    padding: '2px 10px', 
-                    borderRadius: '99px',
-                    fontSize: '0.75rem',
-                    fontWeight: 800
-                  }}>{count} active</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </aside>
       </div>
     </div>
   );

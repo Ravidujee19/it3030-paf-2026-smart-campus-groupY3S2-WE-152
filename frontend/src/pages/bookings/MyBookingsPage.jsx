@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import bookingService from '../../services/bookingService';
 import QrCodeModal from './components/QrCodeModal';
+import bookingsHero from '../../assets/bookings-hero.png';
 import './MyBookingsPage.css';
 
 const MyBookingsPage = () => {
@@ -62,10 +63,26 @@ const MyBookingsPage = () => {
 
   return (
     <div className="my-bookings-page">
-      <div className="page-header">
-        <h1>My Bookings</h1>
-        <p>Keep track of your resource requests and campus activities.</p>
-      </div>
+      <header 
+        className="dashboard-hero" 
+        style={{ backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.7)), url(${bookingsHero})` }}
+      >
+        <div className="hero-content">
+          <h1>Reservations & Activity</h1>
+          <p>Secure your space and manage your campus schedule at a glance.</p>
+          
+          <div className="hero-stats">
+            <div className="stat-item">
+              <span className="stat-label">Upcoming</span>
+              <span className="stat-value">{bookings.filter(b => b.status === 'CONFIRMED' || b.status === 'APPROVED').length}</span>
+            </div>
+            <div className="stat-item">
+              <span className="stat-label">Pending</span>
+              <span className="stat-value">{bookings.filter(b => b.status === 'PENDING').length}</span>
+            </div>
+          </div>
+        </div>
+      </header>
 
       {error && <div className="error-alert">{error}</div>}
 

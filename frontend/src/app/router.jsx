@@ -12,6 +12,7 @@ import ProtectedRoute from "../routes/ProtectedRoute";
 import RoleRoute from "../routes/RoleRoute";
 import AdminLayout from "../layouts/AdminLayout";
 import StaffLayout from "../layouts/StaffLayout";
+import StudentLayout from "../layouts/StudentLayout";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import FacilitiesAssetsPage from "../pages/admin/FacilitiesAssetsPage";
 import BookingManagementPage from "../pages/admin/BookingManagementPage";
@@ -20,6 +21,7 @@ import NotificationsPage from "../pages/admin/NotificationsPage";
 import ResourceListPage from "../pages/resources/ResourceListPage";
 import MyBookingsPage from "../pages/bookings/MyBookingsPage";
 import VerificationPage from "../pages/admin/VerificationPage";
+import StudentDashboard from "../pages/common/StudentDashboard";
 
 const router = createBrowserRouter([
   {
@@ -69,6 +71,7 @@ const router = createBrowserRouter([
       { path: "verify", element: <VerificationPage /> },
       { path: "maintenance", element: <MaintenanceTicketingPage /> },
       { path: "notifications", element: <NotificationsPage /> },
+      { path: "profile", element: <ProfilePage /> }
     ]
   },
   {
@@ -78,6 +81,18 @@ const router = createBrowserRouter([
         <TechnicianPage />
       </RoleRoute>
     ),
+  },
+  {
+    path: "/student",
+    element: (
+      <RoleRoute allowedRoles={["STUDENT"]}>
+        <StudentLayout />
+      </RoleRoute>
+    ),
+    children: [
+      { path: "", element: <StudentDashboard /> },
+      { path: "profile", element: <ProfilePage /> }
+    ]
   },
   {
     path: "/staff",
@@ -91,6 +106,8 @@ const router = createBrowserRouter([
       { path: "facilities", element: <ResourceListPage /> },
       { path: "bookings", element: <MyBookingsPage /> },
       { path: "verify", element: <VerificationPage /> },
+      { path: "profile", element: <ProfilePage /> },
+      { path: "notifications", element: <NotificationsPage /> }
     ]
   },
   {

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.metricon.notification.dto.NotificationResponse;
@@ -15,6 +16,7 @@ import com.metricon.notification.service.NotificationService;
 
 @RestController
 @RequestMapping("/api/notifications")
+@PreAuthorize("isAuthenticated()")
 public class NotificationController {
 
     private final NotificationService notificationService;
@@ -26,6 +28,7 @@ public class NotificationController {
     @GetMapping
     public List<NotificationResponse> getNotifications(@AuthenticationPrincipal OAuth2User principal) {
         String email = principal.getAttribute("email");
+        if (email == null) email = principal.getName();
         return notificationService.getMyNotifications(email);
     }
 
@@ -33,6 +36,7 @@ public class NotificationController {
     public String markAsRead(@PathVariable Long id,
                              @AuthenticationPrincipal OAuth2User principal) {
         String email = principal.getAttribute("email");
+        if (email == null) email = principal.getName();
         notificationService.markAsRead(id, email);
         return "Notification marked as read";
     }
@@ -40,6 +44,7 @@ public class NotificationController {
     @PutMapping("/read-all")
     public String markAllAsRead(@AuthenticationPrincipal OAuth2User principal) {
         String email = principal.getAttribute("email");
+        if (email == null) email = principal.getName();
         notificationService.markAllAsRead(email);
         return "All notifications marked as read";
     }

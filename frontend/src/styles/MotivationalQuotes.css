@@ -1,0 +1,149 @@
+.quotes-widget-container {
+  width: 100%;
+  margin-bottom: 32px;
+  animation: slideUpFade 0.6s ease-out;
+}
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.quotes-card {
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--admin-border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  min-height: 220px;
+  justify-content: center;
+}
+
+/* Background Accent */
+.quotes-card::before {
+  content: "";
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.05) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.quote-icon {
+  color: rgba(37, 99, 235, 0.1);
+  margin-bottom: 16px;
+}
+
+.quote-content {
+  transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+}
+
+.fade-in {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.fade-out {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.quote-text {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--admin-text-dark);
+  line-height: 1.5;
+  margin: 0 0 20px 0;
+  font-style: italic;
+  letter-spacing: -0.01em;
+}
+
+.quote-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 16px;
+}
+
+.quote-author {
+  font-weight: 700;
+  color: var(--admin-primary);
+  font-size: 1rem;
+}
+
+.quote-category {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #64748b;
+  letter-spacing: 1px;
+  background: #f8fafc;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.quote-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+
+.control-btn {
+  background: white;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.control-btn:hover {
+  border-color: var(--admin-primary);
+  color: var(--admin-primary);
+  background: #f0f7ff;
+  transform: scale(1.05);
+}
+
+.quote-indicators {
+  display: flex;
+  gap: 8px;
+}
+
+.indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.indicator.active {
+  width: 24px;
+  border-radius: 4px;
+  background: var(--admin-primary);
+}
+
+@media (max-width: 768px) {
+  .quote-text {
+    font-size: 1.15rem;
+  }
+  
+  .quotes-card {
+    padding: 24px;
+  }
+}

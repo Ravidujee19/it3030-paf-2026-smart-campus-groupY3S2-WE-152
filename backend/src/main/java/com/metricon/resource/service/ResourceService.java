@@ -1,8 +1,12 @@
 package com.metricon.resource.service;
 
+import com.metricon.common.enums.NotificationType;
+import com.metricon.common.enums.RoleName;
+import com.metricon.notification.service.NotificationService;
 import com.metricon.resource.dto.ResourceDto;
 import com.metricon.resource.entity.Resource;
 import com.metricon.resource.repository.ResourceRepository;
+import com.metricon.booking.repository.BookingRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,9 +16,13 @@ import java.util.stream.Collectors;
 public class ResourceService {
 
     private final ResourceRepository resourceRepository;
+    private final NotificationService notificationService;
+    private final BookingRepository bookingRepository;
 
-    public ResourceService(ResourceRepository resourceRepository) {
+    public ResourceService(ResourceRepository resourceRepository, NotificationService notificationService, BookingRepository bookingRepository) {
         this.resourceRepository = resourceRepository;
+        this.notificationService = notificationService;
+        this.bookingRepository = bookingRepository;
     }
 
     public List<ResourceDto> getAllResources() {
@@ -53,7 +61,16 @@ public class ResourceService {
 
     public ResourceDto createResource(ResourceDto dto) {
         Resource resource = mapToEntity(dto);
-        return mapToDto(resourceRepository.save(resource));
+        ResourceDto savedDto = mapToDto(resourceRepository.save(resource));
+        
+        notificationService.notifyRoles(
+            List.of(RoleName.STAFF, RoleName.ADMIN),
+            "New Resource Added",
+            "A new resource '" + savedDto.getName() + "' has been added to the system.",
+            NotificationType.INFO
+        );
+        
+        return savedDto;
     }
 
     public ResourceDto updateResource(Long id, ResourceDto dto) {
@@ -68,6 +85,9 @@ public class ResourceService {
     }
 
     public void deleteResource(Long id) {
+        if (bookingRepository.existsByResourceId(id)) {
+            throw new IllegalArgumentException("Cannot delete resource because it has existing bookings. Please update the status to 'Out of Service' instead.");
+        }
         resourceRepository.deleteById(id);
     }
 
