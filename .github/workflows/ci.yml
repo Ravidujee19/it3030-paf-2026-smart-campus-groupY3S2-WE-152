@@ -24,7 +24,7 @@ jobs:
         cache: maven
 
     - name: Build and run tests
-      run: mvn clean test -Dspring.profiles.active=test
+      run: ./mvnw clean test "-Dspring.profiles.active=test"
 
   build-frontend:
     runs-on: ubuntu-latest

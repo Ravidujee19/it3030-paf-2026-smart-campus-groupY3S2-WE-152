@@ -11,8 +11,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import com.metricon.booking.repository.BookingRepository;
 import com.metricon.notification.service.NotificationService;
-import com.metricon.user.repository.UserRepository;
 
 import java.util.Optional;
 
@@ -30,7 +30,7 @@ class ResourceServiceTest {
     private NotificationService notificationService;
 
     @Mock
-    private UserRepository userRepository;
+    private BookingRepository bookingRepository;
 
     @InjectMocks
     private ResourceService resourceService;
@@ -96,6 +96,7 @@ class ResourceServiceTest {
 
     @Test
     void deleteResource_Success() {
+        when(bookingRepository.existsByResourceId(1L)).thenReturn(false);
         doNothing().when(resourceRepository).deleteById(1L);
 
         assertDoesNotThrow(() -> resourceService.deleteResource(1L));

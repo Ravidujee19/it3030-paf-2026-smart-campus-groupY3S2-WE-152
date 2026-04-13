@@ -75,7 +75,7 @@ class TicketServiceTest {
 
     @Test
     void updateTicketStatus_ValidTransition_Success() {
-        when(ticketRepository.findById(100L)).thenReturn(Optional.of(sampleTicket));
+        when(ticketRepository.findByIdWithAttachments(100L)).thenReturn(Optional.of(sampleTicket));
         when(ticketRepository.save(any(Ticket.class))).thenReturn(sampleTicket);
 
         Ticket updated = ticketService.updateTicketStatus(100L, TicketStatus.IN_PROGRESS);
@@ -86,7 +86,7 @@ class TicketServiceTest {
 
     @Test
     void updateTicketStatus_InvalidTransition_Throws() {
-        when(ticketRepository.findById(100L)).thenReturn(Optional.of(sampleTicket));
+        when(ticketRepository.findByIdWithAttachments(100L)).thenReturn(Optional.of(sampleTicket));
         
         sampleTicket.setStatus(TicketStatus.CLOSED);
 
@@ -100,7 +100,7 @@ class TicketServiceTest {
         tech.setId(2L);
         tech.setEmail("tech@ex.com");
 
-        when(ticketRepository.findById(100L)).thenReturn(Optional.of(sampleTicket));
+        when(ticketRepository.findByIdWithAttachments(100L)).thenReturn(Optional.of(sampleTicket));
         when(userRepository.findById(2L)).thenReturn(Optional.of(tech));
         when(ticketRepository.save(any(Ticket.class))).thenReturn(sampleTicket);
 
@@ -112,7 +112,7 @@ class TicketServiceTest {
 
     @Test
     void deleteTicket_Success() {
-        when(ticketRepository.findById(100L)).thenReturn(Optional.of(sampleTicket));
+        when(ticketRepository.findByIdWithAttachments(100L)).thenReturn(Optional.of(sampleTicket));
         doNothing().when(ticketRepository).delete(sampleTicket);
 
         assertDoesNotThrow(() -> ticketService.deleteTicket(100L));
