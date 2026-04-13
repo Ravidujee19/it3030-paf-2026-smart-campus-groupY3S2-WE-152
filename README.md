@@ -4,6 +4,7 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![React](https://img.shields.io/badge/React-19-blue.svg)](https://reactjs.org/)
 [![Database](https://img.shields.io/badge/Database-PostgreSQL-blue.svg)](https://www.postgresql.org/)
+[![Smart Campus CI/CD](https://github.com/Ravidujee19/it3030-paf-2026-smart-campus-groupY3S2-WE-152/actions/workflows/ci.yml/badge.svg)](https://github.com/Ravidujee19/it3030-paf-2026-smart-campus-groupY3S2-WE-152/actions/workflows/ci.yml)
 
 The **Smart Campus Operations Hub** is an integrated management system designed to streamline campus operations, resource allocation, and incident reporting. It provides a centralized platform for students, staff, and administrators to interact with campus services efficiently.
 
@@ -178,7 +179,7 @@ The backend uses **JUnit 5** and **Mockito** for unit testing, and an **H2 In-me
 1. Navigate to the `backend/` directory.
 2. Execute the following command:
    ```bash
-   ./mvnw test
+   ./mvnw test -Dspring.profiles.active=test
    ```
 
 ### Frontend Tests (Roadmap)
