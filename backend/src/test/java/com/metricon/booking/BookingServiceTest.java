@@ -143,6 +143,6 @@ class BookingServiceTest {
         BookingDto result = bookingService.checkInBooking(100L);
 
         assertTrue(result.getCheckedIn());
-        assertEquals(Booking.BookingStatus.CONFIRMED, result.getStatus());
+        assertEquals(Booking.BookingStatus.APPROVED, result.getStatus());
     }
 }
